@@ -461,7 +461,6 @@ class gameHandler:
 		self.gameController.initSoundHack()
 		# self.gameController.initDifficultyHack()
 		self.gameController.setLockToAllDifficulty()
-		self.gameController.removeAntiTemper()
 
 	def reset(self):
 		"""

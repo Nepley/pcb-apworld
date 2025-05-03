@@ -2,8 +2,8 @@
 Variables
 """
 
-GAME_NAME = "Th07"
-GAME_HASH = ""
+GAME_NAME = ["th07", "Th07"]
+GAME_HASH = "80CBF99382C81EA0A9B7B85C7F9E059A75A52725"
 DISPLAY_NAME = "Touhou Youyoumu ~ Perfect Cherry Blossom"
 SHORT_NAME = "Touhou PCB"
 

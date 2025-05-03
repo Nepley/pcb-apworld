@@ -40,7 +40,7 @@ async def get_all_process():
 	except Exception as e:
 		print(f"Unexpected error: {e}")
 
-async def find_process(name = GAME_NAME, target_checksum = GAME_HASH, hash_algorithm="sha1"):
+async def find_process(names = GAME_NAME, target_checksum = GAME_HASH, hash_algorithm="sha1"):
 	"""Find a process by name or checksum."""
 	processes = await get_all_process()
 	global process_already_checked_list
@@ -48,8 +48,12 @@ async def find_process(name = GAME_NAME, target_checksum = GAME_HASH, hash_algor
 	pid_game = None
 	# First check by name
 	for process in processes:
-		if name in process['Path'].split("\\")[-1]:
-			pid_game = int(process['Id'])
+		for name in names:
+			if name in process['Path'].split("\\")[-1]:
+				pid_game = int(process['Id'])
+				break
+
+		if pid_game is not None:
 			break
 
 	# If not found by name, check by checksum
