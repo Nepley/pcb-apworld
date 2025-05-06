@@ -46,8 +46,6 @@ class gameHandler:
 		self.gameController.setDifficulty(self.getLowestDifficulty(excludeEasy))
 
 	def initResources(self, normalMode = False, autoDifficulty = False):
-		self.givePower()
-
 		if normalMode:
 			self.giveContinues()
 
@@ -302,6 +300,9 @@ class gameHandler:
 	
 	def getCurrentPowerPoint(self):
 		return self.gameController.getPower()
+	
+	def getCurrentScore(self):
+		return self.gameController.getScore()
 
 	#
 	# Set Items Functions
@@ -332,6 +333,8 @@ class gameHandler:
 		if(self.power < 128):
 			self.power += 1
 
+		self.gameController.setStartingPowerPoint(self.power)
+
 		if addInLevel and self.gameController.getGameMode() == IN_GAME and self.gameController.getPower() < 128 and self.gameController.getInDemo() != 1:
 			self.gameController.setPower(self.gameController.getPower() + 1)
 
@@ -340,6 +343,8 @@ class gameHandler:
 			self.power += 25
 		else:
 			self.power = 128
+
+		self.gameController.setStartingPowerPoint(self.power)
 
 		if addInLevel and self.gameController.getGameMode() == IN_GAME and self.gameController.getInDemo() != 1:
 			if self.gameController.getPower() < 103:
@@ -451,12 +456,14 @@ class gameHandler:
 	def initGame(self):
 		self.gameController.initStartingLives()
 		self.gameController.initStartingBombs()
+		self.gameController.initPowerHack()
 
 		self.gameController.setPracticeStartingLives(self.lives)
 		self.gameController.setExtraPhantasmStartingLives(self.lives)
 		self.gameController.setNormalStartingLives(self.lives)
 		self.gameController.setNormalContinueLives(self.lives)
 		self.gameController.setStartingBombs(self.bombs)
+		self.gameController.setStartingPowerPoint(self.power)
 
 		self.gameController.initSoundHack()
 		# self.gameController.initDifficultyHack()

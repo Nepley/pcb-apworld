@@ -28,9 +28,11 @@ class gameController:
 	addrExtraPhantasmStartingLives = None
 	addrNormalStartingLives = None
 	addrStartingBombs = None
+	addrStartingPowerPoint = None
 
 	# Stats
 	addrMisses = None
+	addrScore = None
 
 	# Practice stage access
 	addrReimuAEasy = None
@@ -101,6 +103,9 @@ class gameController:
 	addrLifeHack2 = None
 	addrBombHack1 = None
 	addrBombHack2 = None
+	addrPowerHack1 = None
+	addrPowerHack2 = None
+	addrPowerHack3 = None
 
 	# Sound
 	addrCustomSoundId = None
@@ -131,8 +136,10 @@ class gameController:
 		self.addrPracticeStartingLives = self.pm.base_address+ADDR_PRACTICE_STARTING_LIVES
 		self.addrExtraPhantasmStartingLives = self.pm.base_address+ADDR_EXTRA_PHANTASM_STARTING_LIVES
 		self.addrStartingBombs = self.pm.base_address+ADDR_STARTING_BOMBS
+		self.addrStartingPowerPoint = self.pm.base_address+ADDR_STARTING_POWER_POINT
 
 		self.addrMisses = getPointerAddress(self.pm, self.pm.base_address+ADDR_MISSES[0], ADDR_MISSES[1:])
+		self.addrScore = getPointerAddress(self.pm, self.pm.base_address+ADDR_SCORE[0], ADDR_SCORE[1:])
 
 		self.addrReimuAEasy = self.pm.base_address+ADDR_REIMU_A_EASY
 		self.addrReimuANormal = self.pm.base_address+ADDR_REIMU_A_NORMAL
@@ -192,6 +199,9 @@ class gameController:
 		self.addrLifeHack2 = self.pm.base_address+ADDR_LIVES_HACK_2
 		self.addrBombHack1 = self.pm.base_address+ADDR_BOMB_HACK_1
 		self.addrBombHack2 = self.pm.base_address+ADDR_BOMB_HACK_2
+		self.addrPowerHack1 = self.pm.base_address+ADDR_POWER_HACK_1
+		self.addrPowerHack2 = self.pm.base_address+ADDR_POWER_HACK_2
+		self.addrPowerHack3 = self.pm.base_address+ADDR_POWER_HACK_3
 
 		self.addrCustomSoundId = self.pm.base_address+ADDR_CUSTOM_SOUND_ID
 		self.addrSoundHack1 = self.pm.base_address+ADDR_SOUND_HACK_1
@@ -481,6 +491,10 @@ class gameController:
 	def getMisses(self):
 		self.addrMisses = getPointerAddress(self.pm, self.pm.base_address+ADDR_MISSES[0], ADDR_MISSES[1:])
 		return int(self.pm.read_float(self.addrMisses))
+	
+	def getScore(self):
+		self.addrScore = getPointerAddress(self.pm, self.pm.base_address+ADDR_SCORE[0], ADDR_SCORE[1:])
+		return int.from_bytes(self.pm.read_bytes(self.addrScore, 4))
 
 	def getContinues(self):
 		self.addrContinues = getPointerAddress(self.pm, self.pm.base_address+ADDR_CONTINUE[0], ADDR_CONTINUE[1:])
@@ -561,6 +575,7 @@ class gameController:
 		return int(self.pm.read_float(self.addrInDemo))
 
 	def getMenu(self):
+		self.addrMenu = getPointerAddress(self.pm, self.pm.base_address+ADDR_MENU[0], ADDR_MENU[1:])
 		return int.from_bytes(self.pm.read_bytes(self.addrMenu, 1))
 
 	def getMenuCursor(self):
@@ -644,6 +659,9 @@ class gameController:
 
 	def setStartingBombs(self, newStartingBombs):
 		self.pm.write_float(self.addrStartingBombs, float(newStartingBombs))
+
+	def setStartingPowerPoint(self, newStartingPowerPoint):
+		self.pm.write_float(self.addrStartingPowerPoint, float(newStartingPowerPoint))
 
 	def setMisses(self, newMisses):
 		self.pm.write_short(self.addrMisses, newMisses)
@@ -883,6 +901,11 @@ class gameController:
 	def initStartingBombs(self):
 		self.pm.write_bytes(self.addrBombHack1, bytes([0xC7, 0x41, 0x68, 0x00, 0x00, 0x00, 0x00, 0xEB, 0x16]), 9)
 		self.pm.write_bytes(self.addrBombHack2, bytes([0xEB, 0xE2, 0x90]), 3)
+
+	def initPowerHack(self):
+		self.pm.write_bytes(self.addrPowerHack1, bytes([0x90, 0x90]), 2)
+		self.pm.write_bytes(self.addrPowerHack2, bytes([0x90, 0x90]), 2)
+		self.pm.write_bytes(self.addrPowerHack3, bytes([0xD9, 0x05, 0x8B, 0xF6, 0x62, 0x00]), 6)
 
 	def initDifficultyHack(self):
 		self.pm.write_bytes(self.addrDifficutlyCondition, bytes([0xC6, 0x80]), 2)
