@@ -482,6 +482,7 @@ class TouhouContext(CommonContext):
 			resourcesGiven = False
 			noCheck = True #We start by disabling the checks since we don't know where the player would be when connecting the client
 			currentScore = 0
+			currentContinue = 0
 			while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
 				await asyncio.sleep(0.5)
 				gameMode = self.handler.getGameMode()
@@ -504,6 +505,7 @@ class TouhouContext(CommonContext):
 						bossCounter = -1
 						bossPresent = False
 						currentScore = 0
+						currentContinue = self.handler.getCurrentContinues()
 
 						# If the current situation is technically not possible, we lock checks
 						if(not self.handler.checkIfCurrentIsPossible((self.options['mode'] in NORMAL_MODE))):
@@ -516,11 +518,13 @@ class TouhouContext(CommonContext):
 						currentLives = self.handler.getCurrentLives()
 
 					# We check if the current score is the same or higher than the previous one
-					if(currentScore <= self.handler.getCurrentScore()):
+					if(currentScore <= self.handler.getCurrentScore() or (self.options['mode'] in NORMAL_MODE and currentContinue <= self.handler.getCurrentContinues())):
 						currentScore = self.handler.getCurrentScore()
+						currentContinue = self.handler.getCurrentContinues()
 					else:
 						# If the score is lower, it mean the stage has been restarted, we end the loop and act like we just enter the stage
 						currentMode = -1
+						resourcesGiven = False
 						continue
 
 					# Boss Check

@@ -97,6 +97,7 @@ class gameController:
 	addrKillCondition = None
 	addrCharacterLock = None
 	addrForceExtra = None
+	addrDemoCondtion = None
 
 	# Resources Hack
 	addrLifeHack1 = None
@@ -185,6 +186,7 @@ class gameController:
 		self.addrMenuCursor =  getPointerAddress(self.pm, self.pm.base_address+ADDR_MENU_CURSOR[0], ADDR_MENU_CURSOR[1:])
 		self.addrInDemo = self.pm.base_address+ADDR_IN_DEMO
 		self.addrIsBossPresent = self.pm.base_address+ADDR_IS_BOSS_PRESENT
+		self.addrDemoCondtion = self.pm.base_address+ADDR_DEMO_CONDITION
 
 		self.addrKillCondition = self.pm.base_address+ADDR_KILL_CONDITION
 
@@ -494,7 +496,7 @@ class gameController:
 	
 	def getScore(self):
 		self.addrScore = getPointerAddress(self.pm, self.pm.base_address+ADDR_SCORE[0], ADDR_SCORE[1:])
-		return int.from_bytes(self.pm.read_bytes(self.addrScore, 4))
+		return self.pm.read_int(self.addrScore)
 
 	def getContinues(self):
 		self.addrContinues = getPointerAddress(self.pm, self.pm.base_address+ADDR_CONTINUE[0], ADDR_CONTINUE[1:])
@@ -908,7 +910,10 @@ class gameController:
 		self.pm.write_bytes(self.addrPowerHack3, bytes([0xD9, 0x05, 0x8B, 0xF6, 0x62, 0x00]), 6)
 
 	def initDifficultyHack(self):
-		self.pm.write_bytes(self.addrDifficutlyCondition, bytes([0xC6, 0x80]), 2)
+		self.pm.write_bytes(self.addrDifficutlyCondition, bytes([0xC6, 0x00]), 2)
+
+	def disableDemo(self):
+		self.pm.write_bytes(self.addrDemoCondtion, bytes([0xE9, 0x79, 0x01, 0x00, 0x00, 0x90]), 6)
 
 	def setFpsUpdate(self, active):
 		if active:

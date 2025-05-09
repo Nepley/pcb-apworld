@@ -304,6 +304,9 @@ class gameHandler:
 	def getCurrentScore(self):
 		return self.gameController.getScore()
 
+	def getCurrentContinues(self):
+		return self.gameController.getContinues()
+
 	#
 	# Set Items Functions
 	#
@@ -466,8 +469,9 @@ class gameHandler:
 		self.gameController.setStartingPowerPoint(self.power)
 
 		self.gameController.initSoundHack()
-		# self.gameController.initDifficultyHack()
+		self.gameController.initDifficultyHack()
 		self.gameController.setLockToAllDifficulty()
+		self.gameController.disableDemo()
 
 	def reset(self):
 		"""
