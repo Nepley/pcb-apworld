@@ -141,7 +141,7 @@ def getLocationMapping(shot_type, difficulty):
 		# Stage
 		if "Stage" in location:
 			level_id = location.split(" ")[-2]
-			level = 6 if level_id == "Extra" else int(level_id)-1
+			level = 6 if level_id == "Extra" else 7 if level_id == "Phantasm" else int(level_id)-1
 			counter = len(STAGES_LIST[level])-1
 
 			# If it's the final stage clear, we add it to the list

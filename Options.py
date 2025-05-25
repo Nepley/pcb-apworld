@@ -79,7 +79,7 @@ class ExtraStage(Choice):
 	"""
 	Determine if the extra stage is included
     Linear: The extra stage is considered as the 7th stage
-    Apart: The extra stage has it's own item fo it to be unlocked
+    Apart: The extra stage has it's own item for it to be unlocked
     This option will follow the rule of how the stage are unlocked in Practice Mode (Global, By Character or By Shot Type)
 	"""
 	display_name = "Determine if the extra stage is included"
@@ -102,6 +102,33 @@ class NumberBombsExtra(Range):
 	range_end = 8
 	default = 0
 
+class PhantasmStage(Choice):
+	"""
+	Determine if the phantasm stage is included
+    Linear: The Extra Stage must be enabled and the phantasm stage is unlocked after beating it
+    Apart: The phantasm stage has it's own item for it to be unlocked
+    This option will follow the rule of how the stage are unlocked in Practice Mode (Global, By Character or By Shot Type)
+	"""
+	display_name = "Determine if the phantasm stage is included"
+	option_exclude = 0
+	option_include_linear = 1
+	option_include_apart = 2
+	default = 0
+
+class NumberLifePhantasm(Range):
+	"""Number of life the randomizer expect you to have before facing Yukari"""
+	display_name = "Number of life expected in order to face Yukari"
+	range_start = 0
+	range_end = 8
+	default = 0
+
+class NumberBombsPhantasm(Range):
+	"""Number of bombs the randomizer expect you to have before facing Yukari"""
+	display_name = "Number of bombs expected in order to face Yukari"
+	range_start = 0
+	range_end = 8
+	default = 0
+
 class ShotTypeCheck(Toggle):
 	""""If each shot type have their own check and are not just separated by character"""
 	display_name = "Shot Type Check"
@@ -118,11 +145,12 @@ class DifficultyCheck(Choice):
 	option_true_with_lower = 2
 
 class Goal(Choice):
-	"""If the Extra Stage is included, determine which boss is the goal."""
+	"""If the Extra or Phantasm Stage is included, determine which boss is the goal."""
 	display_name = "Goal"
 	option_yuyuko = 0
 	option_ran = 1
-	option_both = 2
+	option_yukari = 2
+	option_all = 3
 	default = 0
 
 class EndingRequired(Choice):
@@ -251,6 +279,9 @@ game_options: Dict[str, type(Option)] = {
 	"extra_stage": ExtraStage,
 	"number_life_extra": NumberLifeExtra,
 	"number_bomb_extra": NumberBombsExtra,
+	"phantasm_stage": PhantasmStage,
+	"number_life_phantasm": NumberLifePhantasm,
+	"number_bomb_phantasm": NumberBombsPhantasm,
 	"shot_type": ShotTypeCheck,
 	"difficulty_check": DifficultyCheck,
 	"goal": Goal,

@@ -15,6 +15,7 @@ for character in ALL_CHARACTERS_LIST:
 			location_table[f"[{character}] {check}"] = STARTING_ID + location_id_offset
 			location_id_offset += 1
 		level_name = "Extra" if level == 7 else level
+		level_name = "Phantasm" if level == 8 else level_name
 		location_table[f"[{character}] Stage {level_name} Clear"] = STARTING_ID + location_id_offset
 		location_id_offset += 1
 

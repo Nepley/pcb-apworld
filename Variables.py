@@ -23,6 +23,7 @@ NORMAL = 1
 HARD = 2
 LUNATIC = 3
 EXTRA = 4
+PHANTASM = 5
 
 NO_EXTRA = 0
 EXTRA_LINEAR = 1
@@ -44,8 +45,9 @@ IN_GAME = 1
 
 ENDING_NORMAL = 0
 ENDING_EXTRA = 1
-ENDING_BOTH = 2
-ENDINGS = [ENDING_NORMAL, ENDING_EXTRA]
+ENDING_PHANTASM = 2
+ENDING_ALL = 3
+ENDINGS = [ENDING_NORMAL, ENDING_EXTRA, ENDING_PHANTASM]
 ONE_ENDING = 0
 ALL_CHARACTER_ENDING = 1
 ALL_SHOT_TYPE_ENDING = 2
@@ -64,18 +66,19 @@ SHOT_TYPE_LIST = ["Reimu A", "Reimu B", "Marisa A", "Marisa B", "Sakuya A", "Sak
 CHARACTER_SHOT_LINK = {"Reimu": ["Reimu A", "Reimu B"], "Marisa": ["Marisa A", "Marisa B"], "Sakuya": ["Sakuya A", "Sakuya B"]}
 ALL_CHARACTERS_LIST = CHARACTERS_LIST + SHOT_TYPE_LIST
 CHARACTER_TO_ITEM = {
-    "Reimu": ["Reimu A - Spirit Sign", "Reimu B - Dream Sign"],
-    "Marisa": ["Marisa A - Magic Sign", "Marisa B - Love Sign"],
-    "Sakuya": ["Sakuya A - Illusion Sign", "Sakuya B - Time Sign"],
-    "Reimu A": ["Reimu A - Spirit Sign"],
-    "Reimu B": ["Reimu B - Dream Sign"],
-    "Marisa A": ["Marisa A - Magic Sign"],
-    "Marisa B": ["Marisa B - Love Sign"],
-    "Sakuya A": ["Sakuya A - Illusion Sign"],
-    "Sakuya B": ["Sakuya B - Time Sign"]
+	"Reimu": ["Reimu A - Spirit Sign", "Reimu B - Dream Sign"],
+	"Marisa": ["Marisa A - Magic Sign", "Marisa B - Love Sign"],
+	"Sakuya": ["Sakuya A - Illusion Sign", "Sakuya B - Time Sign"],
+	"Reimu A": ["Reimu A - Spirit Sign"],
+	"Reimu B": ["Reimu B - Dream Sign"],
+	"Marisa A": ["Marisa A - Magic Sign"],
+	"Marisa B": ["Marisa B - Love Sign"],
+	"Sakuya A": ["Sakuya A - Illusion Sign"],
+	"Sakuya B": ["Sakuya B - Time Sign"]
 }
 DIFFICULTY_LIST = ["Easy", "Normal", "Hard", "Lunatic"]
 EXTRA_CHECKS = ["Chen - MidBoss 2",	"Ran Defeated"]
+PHANTASM_CHECKS = ["Ran - MidBoss",	"Yukari Defeated"]
 STAGES_LIST = [
 	["Cirno Defeated", "Letty Defeated"],
 	["Chen - MidBoss 1", "Chen Defeated"],
@@ -83,10 +86,12 @@ STAGES_LIST = [
 	["Lily White - MidBoss", "Prismriver Defeated"],
 	["Youmu - MidBoss 1", "Youmu Defeated"],
 	["Youmu - MidBoss 2", "Yuyuko Defeated"],
-	EXTRA_CHECKS
+	EXTRA_CHECKS,
+	PHANTASM_CHECKS
 ]
 ENDING_NORMAL_ITEM = "Ending - Yuyuko"
 ENDING_EXTRA_ITEM = "Ending - Ran"
+ENDING_PHANTASM_ITEM = "Ending - Yukari"
 
 """
 Addresses
@@ -162,6 +167,14 @@ ADDR_MARISA_A_EXTRA = 0x0022E6FC
 ADDR_MARISA_B_EXTRA = 0x0022E718
 ADDR_SAKUYA_A_EXTRA = 0x0022E734
 ADDR_SAKUYA_B_EXTRA = 0x0022E750
+
+# Phantasm stage access
+ADDR_REIMU_A_PHANTASM = 0x0022E6C9
+ADDR_REIMU_B_PHANTASM = 0x0022E6E5
+ADDR_MARISA_A_PHANTASM = 0x0022E701
+ADDR_MARISA_B_PHANTASM = 0x0022E71D
+ADDR_SAKUYA_A_PHANTASM = 0x0022E739
+ADDR_SAKUYA_B_PHANTASM = 0x0022E755
 
 # Practice stage score
 ADDR_REIMU_A_EASY_SCORE_1 = 0x0022E770
@@ -333,18 +346,16 @@ ADDR_SAKUYA_B_LUNATIC_SCORE_5 = 0x0022F478
 ADDR_SAKUYA_B_LUNATIC_SCORE_6 = 0x0022F4D8
 
 # Character Speed
-ADDR_NORMAL_SPEED = None
-ADDR_FOCUS_SPEED = None
-ADDR_NORMAL_SPEED_D = None
-ADDR_FOCUS_SPEED_D = None
+ADDR_NORMAL_SPEED = [0x00175948, 0x24]
+ADDR_FOCUS_SPEED = [0x00175948, 0x28]
+ADDR_NORMAL_SPEED_D = [0x00175948, 0x2C]
+ADDR_FOCUS_SPEED_D = [0x00175948, 0x30]
 
 #Difficulty lock
 ADDR_LOCK_1 = 0x00058C25
-ADDR_LOCK_2 = 0x00059578
-ADDR_LOCK_3 = 0x00059800
-ADDR_LOCK_4 = 0x00059BEF
-ADDR_LOCK_5 = 0x00058060
-ADDR_LOCK_6 = 0x00058105
+ADDR_LOCK_2 = 0x00059800
+ADDR_LOCK_3 = 0x00059BEF
+ADDR_LOCK_4 = 0x00058105
 
 # Starting Resources
 ADDR_LIVES_HACK_1 = 0x0002EA07
@@ -363,6 +374,10 @@ ADDR_SOUND_HACK_2 = 0x00002051
 ADDR_DIFFICULTY_UP = 0x0005BBBB
 ADDR_DIFFICULTY_DOWN = 0x0005BC57
 ADDR_DIFFICULTY_CONDITION = 0x0005BC55
+ADDR_LAST_DIFFICULTY = 0x00175A89
+ADDR_DEFAULT_DIFFICULTY_1 = 0x00055DB1
+ADDR_DEFAULT_DIFFICULTY_2 = 0x00057AB1
+ADDR_DEFAULT_EXTRA_DIFFICULTY = 0x00057B6C
 
 # FPS
 ADDR_FPS_UPDATE = 0x0003937E
@@ -372,3 +387,4 @@ ADDR_FPS_TEXT = 0x0022F69E
 ADDR_KILL_CONDITION = 0x0003E308
 ADDR_CONTROLLER_HANDLER = 0x000B9E4C
 ADDR_DEMO_CONDITION = 0x00055A9E
+ADDR_FOCUS_CONDITION = 0x0003EF98

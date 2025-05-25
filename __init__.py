@@ -36,11 +36,13 @@ class TWorld(World):
 		character_list = []
 		stages = []
 		extra_stages = []
+		phantasm_stages = []
 		total_locations = len(self.multiworld.get_unfilled_locations(self.player))
 		number_placed_item = 0
 		mode = getattr(self.options, "mode")
 		stage_unlock = getattr(self.options, "stage_unlock")
 		extra = getattr(self.options, "extra_stage")
+		phantasm = getattr(self.options, "phantasm_stage")
 		goal = getattr(self.options, "goal")
 		shot_type = getattr(self.options, "shot_type")
 		difficulty_check = getattr(self.options, "difficulty_check")
@@ -94,6 +96,11 @@ class TWorld(World):
 				extra_stages.append({"name": name, "data": data})
 				continue
 
+			# Will be added later
+			if data.category in ["[Global] Phantasm Stage", "[Character] Phantasm Stage", "[Shot Type] Phantasm Stage"]:
+				phantasm_stages.append({"name": name, "data": data})
+				continue
+
 			item_pool += [self.create_item(name) for _ in range(0, quantity)]
 
 		# Stages
@@ -106,6 +113,9 @@ class TWorld(World):
 				quantity = stage['data'].max_quantity
 				# If there is no extra stage or it's separated, we remove one stage
 				if extra != EXTRA_LINEAR:
+					quantity -= 1
+
+				if phantasm != EXTRA_LINEAR:
 					quantity -= 1
 
 				if stage_unlock == STAGE_GLOBAL and stage['data'].category == "[Global] Stages":
@@ -135,6 +145,24 @@ class TWorld(World):
 				if stage_unlock == STAGE_BY_SHOT_TYPE and stage['data'].category == "[Shot Type] Extra Stage":
 					item_pool += [self.create_item(stage['name']) for _ in range(0, quantity)]
 
+		# Phantasm
+		if phantasm == EXTRA_APART:
+			# If we have stage by shot type but we don't any option adding location, we change it to stage by character
+			if stage_unlock == STAGE_BY_SHOT_TYPE and not shot_type and not difficulty_check:
+				stage_unlock = STAGE_BY_CHARACTER
+
+			for stage in phantasm_stages:
+				quantity = stage['data'].max_quantity
+
+				if stage_unlock == STAGE_GLOBAL and stage['data'].category == "[Global] Phantasm Stage":
+					item_pool += [self.create_item(stage['name']) for _ in range(0, quantity)]
+
+				if stage_unlock == STAGE_BY_CHARACTER and stage['data'].category == "[Character] Phantasm Stage":
+					item_pool += [self.create_item(stage['name']) for _ in range(0, quantity)]
+
+				if stage_unlock == STAGE_BY_SHOT_TYPE and stage['data'].category == "[Shot Type] Phantasm Stage":
+					item_pool += [self.create_item(stage['name']) for _ in range(0, quantity)]
+
 		# Selecting starting character
 		chosen = self.random.choice(character_list)
 		self.multiworld.push_precollected(self.create_item(chosen))
@@ -149,9 +177,12 @@ class TWorld(World):
 		ending_extra_reimu = self.create_item("[Reimu] Ending - Ran")
 		ending_extra_marisa = self.create_item("[Marisa] Ending - Ran")
 		ending_extra_sakuya = self.create_item("[Sakuya] Ending - Ran")
+		ending_phantasm_reimu = self.create_item("[Reimu] Ending - Yukari")
+		ending_phantasm_marisa = self.create_item("[Marisa] Ending - Yukari")
+		ending_phantasm_sakuya = self.create_item("[Sakuya] Ending - Yukari")
 
 		# If we have the extra stage and the extra boss is a potential goal
-		if extra and goal != ENDING_NORMAL:
+		if extra and goal not in [ENDING_NORMAL, ENDING_PHANTASM]:
 			if shot_type:
 				self.multiworld.get_location("[Reimu A] Stage Extra Clear", self.player).place_locked_item(ending_extra_reimu)
 				self.multiworld.get_location("[Reimu B] Stage Extra Clear", self.player).place_locked_item(ending_extra_reimu)
@@ -166,8 +197,24 @@ class TWorld(World):
 				self.multiworld.get_location("[Sakuya] Stage Extra Clear", self.player).place_locked_item(ending_extra_sakuya)
 				number_placed_item += 3
 
+		# If we have the phantasm stage and the extra boss is a potential goal
+		if phantasm and goal not in [ENDING_NORMAL, ENDING_EXTRA]:
+			if shot_type:
+				self.multiworld.get_location("[Reimu A] Stage Phantasm Clear", self.player).place_locked_item(ending_phantasm_reimu)
+				self.multiworld.get_location("[Reimu B] Stage Phantasm Clear", self.player).place_locked_item(ending_phantasm_reimu)
+				self.multiworld.get_location("[Marisa A] Stage Phantasm Clear", self.player).place_locked_item(ending_phantasm_marisa)
+				self.multiworld.get_location("[Marisa B] Stage Phantasm Clear", self.player).place_locked_item(ending_phantasm_marisa)
+				self.multiworld.get_location("[Sakuya A] Stage Phantasm Clear", self.player).place_locked_item(ending_phantasm_sakuya)
+				self.multiworld.get_location("[Sakuya B] Stage Phantasm Clear", self.player).place_locked_item(ending_phantasm_sakuya)
+				number_placed_item += 6
+			else:
+				self.multiworld.get_location("[Reimu] Stage Phantasm Clear", self.player).place_locked_item(ending_phantasm_reimu)
+				self.multiworld.get_location("[Marisa] Stage Phantasm Clear", self.player).place_locked_item(ending_phantasm_marisa)
+				self.multiworld.get_location("[Sakuya] Stage Phantasm Clear", self.player).place_locked_item(ending_phantasm_sakuya)
+				number_placed_item += 3
+
 		# If the final boss is a potential goal
-		if not extra or goal != ENDING_EXTRA:
+		if not extra or goal not in [ENDING_EXTRA, ENDING_PHANTASM]:
 			if shot_type:
 				self.multiworld.get_location("[Reimu A] Stage 6 Clear", self.player).place_locked_item(ending_normal_reimu)
 				self.multiworld.get_location("[Reimu B] Stage 6 Clear", self.player).place_locked_item(ending_normal_reimu)

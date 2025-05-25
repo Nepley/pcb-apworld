@@ -20,6 +20,7 @@ class gameHandler:
 
 	bossBeaten = []
 	extraBeaten = []
+	phantasmBeaten = []
 
 	def __init__(self, pid):
 		self.gameController = gameController(pid)
@@ -70,10 +71,18 @@ class gameHandler:
 						for shot in SHOTS:
 							for stage in range(6):
 								score = 0
-								if self.isBossBeaten(character, stage, 1, shot, difficulty):
-									score += 444444444
-								if self.isBossBeaten(character, stage, 0, shot, difficulty):
-									score += 555555555
+								if stage == 2:
+									if self.isBossBeaten(character, stage, 2, shot, difficulty):
+										score += 333333333
+									if self.isBossBeaten(character, stage, 1, shot, difficulty):
+										score += 333333333
+									if self.isBossBeaten(character, stage, 0, shot, difficulty):
+										score += 333333333
+								else:
+									if self.isBossBeaten(character, stage, 1, shot, difficulty):
+										score += 444444444
+									if self.isBossBeaten(character, stage, 0, shot, difficulty):
+										score += 555555555
 
 								# Easy mode has no stage 6
 								if stage < 5 or difficulty != 0 or easyStage6:
@@ -83,10 +92,18 @@ class gameHandler:
 					for character in CHARACTERS:
 						for stage in range(6):
 							score = 0
-							if self.isBossBeaten(character, stage, 1, -1, difficulty):
-								score += 444444444
-							if self.isBossBeaten(character, stage, 0, -1, difficulty):
-								score += 555555555
+							if stage == 2:
+								if self.isBossBeaten(character, stage, 2, -1, difficulty):
+									score += 333333333
+								if self.isBossBeaten(character, stage, 1, -1, difficulty):
+									score += 333333333
+								if self.isBossBeaten(character, stage, 0, -1, difficulty):
+									score += 333333333
+							else:
+								if self.isBossBeaten(character, stage, 1, -1, difficulty):
+									score += 444444444
+								if self.isBossBeaten(character, stage, 0, -1, difficulty):
+									score += 555555555
 
 							# Easy mode has no stage 6
 							if stage < 5 or difficulty != 0 or easyStage6:
@@ -98,10 +115,18 @@ class gameHandler:
 					for shot in SHOTS:
 						for stage in range(6):
 							score = 0
-							if self.isBossBeaten(character, stage, 1, shot):
-								score += 444444444
-							if self.isBossBeaten(character, stage, 0, shot):
-								score += 555555555
+							if stage == 2:
+								if self.isBossBeaten(character, stage, 2, shot):
+									score += 333333333
+								if self.isBossBeaten(character, stage, 1, shot):
+									score += 333333333
+								if self.isBossBeaten(character, stage, 0, shot):
+									score += 333333333
+							else:
+								if self.isBossBeaten(character, stage, 1, shot):
+									score += 444444444
+								if self.isBossBeaten(character, stage, 0, shot):
+									score += 555555555
 
 							# Easy mode has no stage 6
 							if stage < 5 or easyStage6:
@@ -114,10 +139,18 @@ class gameHandler:
 				for character in CHARACTERS:
 					for stage in range(6):
 						score = 0
-						if self.isBossBeaten(character, stage, 1):
-							score += 444444444
-						if self.isBossBeaten(character, stage, 0):
-							score += 555555555
+						if stage == 2:
+							if self.isBossBeaten(character, stage, 2):
+								score += 333333333
+							if self.isBossBeaten(character, stage, 1):
+								score += 333333333
+							if self.isBossBeaten(character, stage, 0):
+								score += 333333333
+						else:
+							if self.isBossBeaten(character, stage, 1):
+								score += 444444444
+							if self.isBossBeaten(character, stage, 0):
+								score += 555555555
 
 						for shot in SHOTS:
 							# Easy mode has no stage 6
@@ -128,16 +161,41 @@ class gameHandler:
 							self.gameController.setPracticeStageScore(character, shot, HARD, stage, score)
 							self.gameController.setPracticeStageScore(character, shot, LUNATIC, stage, score)
 
-	def updateExtraUnlock(self, otherMode = False):
+	def updateExtraUnlock(self, otherMode = False, phantasm = False):
 		"""
 		Update access to the Extra stage
 		"""
-		for characters in CHARACTERS:
-			for shots in SHOTS:
-				if self.characters[characters][shots] and (self.hasExtra[characters][shots] or otherMode):
-					self.gameController.setCharacterDifficulty(characters, shots, EXTRA, 99)
-				else:
-					self.gameController.setCharacterDifficulty(characters, shots, EXTRA, 0)
+		canExtra = self.canExtra()
+		canPhantasm = self.canPhantasm()
+		if canExtra or otherMode:
+			for characters in CHARACTERS:
+				for shots in SHOTS:
+					if self.characters[characters][shots] and (self.hasExtra[characters][shots] or otherMode):
+						self.gameController.setCharacterDifficulty(characters, shots, EXTRA, 99)
+					else:
+						self.gameController.setCharacterDifficulty(characters, shots, EXTRA, 1)
+		else:
+			# If we don't have Extra but we have Phantasm, we unlock the Extra like the Phantasm
+			for characters in CHARACTERS:
+				for shots in SHOTS:
+					if self.characters[characters][shots] and (self.hasPhantasm[characters][shots]):
+						self.gameController.setCharacterDifficulty(characters, shots, EXTRA, 99)
+					else:
+						self.gameController.setCharacterDifficulty(characters, shots, EXTRA, 0)
+
+		if phantasm:
+			for characters in CHARACTERS:
+				for shots in SHOTS:
+					if self.characters[characters][shots] and self.hasPhantasm[characters][shots]:
+						self.gameController.setCharacterDifficulty(characters, shots, PHANTASM, 99)
+					else:
+						self.gameController.setCharacterDifficulty(characters, shots, PHANTASM, 0)
+
+		# If we can only do Phantasm stage, we set the cursor default position to 1
+		if canPhantasm and not canExtra:
+			self.gameController.setDefaultExtraDifficulty(0x01)
+		else:
+			self.gameController.setDefaultExtraDifficulty(0x00)
 
 	#
 	# Boss
@@ -148,6 +206,9 @@ class gameHandler:
 		# If it's the extra stage
 		if self.gameController.getStage() == 7:
 			isDefeated = self.extraBeaten[self.gameController.getCharacter()][self.gameController.getShotType()][counter]
+		# If it's the phantasm stage
+		elif self.gameController.getStage() == 8:
+			isDefeated = self.phantasmBeaten[self.gameController.getCharacter()][self.gameController.getShotType()][counter]
 		else:
 			isDefeated = self.bossBeaten[self.gameController.getCharacter()][self.gameController.getShotType()][self.gameController.getDifficulty()][self.gameController.getStage()-1][counter]
 
@@ -160,6 +221,8 @@ class gameHandler:
 
 		if self.gameController.getStage() == 7:
 			self.extraBeaten[self.gameController.getCharacter()][self.gameController.getShotType()][counter] = True
+		elif self.gameController.getStage() == 8:
+			self.phantasmBeaten[self.gameController.getCharacter()][self.gameController.getShotType()][counter] = True
 		else:
 			self.bossBeaten[self.gameController.getCharacter()][self.gameController.getShotType()][self.gameController.getDifficulty()][self.gameController.getStage()-1][counter] = True
 			if otherDifficulties:
@@ -187,6 +250,13 @@ class gameHandler:
 			else:
 				for shot in SHOTS:
 					self.extraBeaten[character][shot][counter] = True
+		# If it's the Phantasm Stage
+		elif stage == 7:
+			if shot_type in SHOTS:
+				self.phantasmBeaten[character][shot_type][counter] = True
+			else:
+				for shot in SHOTS:
+					self.phantasmBeaten[character][shot][counter] = True
 		# Else, we check all difficulties
 		else:
 			if shot_type in SHOTS:
@@ -213,6 +283,13 @@ class gameHandler:
 			else:
 				for shot in SHOTS:
 					flags.append(self.extraBeaten[character][shot][counter])
+		# If it's the Phantasm Stage
+		elif stage == 7:
+			if shot_type in SHOTS:
+				flags.append(self.phantasmBeaten[character][shot_type][counter])
+			else:
+				for shot in SHOTS:
+					flags.append(self.phantasmBeaten[character][shot][counter])
 		# Else, we check all difficulties
 		else:
 			if shot_type in SHOTS:
@@ -270,6 +347,21 @@ class gameHandler:
 
 		return can
 
+	def canPhantasm(self):
+		"""
+		If any character can access to the Phantasm stage.
+		"""
+		can = False
+		for character in CHARACTERS:
+			for shot in SHOTS:
+				if self.characters[character][shot] and self.hasPhantasm[character][shot]:
+					can = True
+					break
+			if can:
+				break
+
+		return can
+
 	#
 	# Get Games Functions
 	#
@@ -294,13 +386,13 @@ class gameHandler:
 
 	def isBossPresent(self):
 		return self.gameController.getIsBossPresent() == 1
-	
+
 	def getCurrentStage(self):
 		return self.gameController.getStage()
-	
+
 	def getCurrentPowerPoint(self):
 		return self.gameController.getPower()
-	
+
 	def getCurrentScore(self):
 		return self.gameController.getScore()
 
@@ -355,7 +447,7 @@ class gameHandler:
 			else:
 				self.gameController.setPower(128)
 
-	def addStage(self, extra = False, character = -1, shot_type = -1):
+	def addStage(self, extra = False, phantasm = False, character = -1, shot_type = -1):
 		character_list = [character] if character > -1 else CHARACTERS
 		shot_type_list = [shot_type] if shot_type > -1 else SHOTS
 
@@ -365,6 +457,8 @@ class gameHandler:
 					self.stages[character][shot] += 1
 				elif(self.stages[character][shot] == 6 and extra):
 					self.unlockExtraStage(character, shot)
+				elif (self.stages[character][shot] == 6 and not extra and phantasm) or (self.stages[character][shot] == 7 and extra and phantasm):
+					self.unlockPhantasmStage(character, shot)
 
 	def addContinue(self):
 		if(self.continues < 3):
@@ -393,6 +487,20 @@ class gameHandler:
 				for shot in SHOTS:
 					self.hasExtra[character][shot] = True
 
+	def unlockPhantasmStage(self, character = -1, shot_type = -1):
+		# Unlock for one character/shot type
+		if character > -1 and shot_type > -1:
+			self.hasPhantasm[character][shot_type] = True
+		# Unlock for one character
+		elif character > -1:
+			for shot in SHOTS:
+				self.hasPhantasm[character][shot] = True
+		# Unlock for all characters
+		else:
+			for character in CHARACTERS:
+				for shot in SHOTS:
+					self.hasPhantasm[character][shot] = True
+
 	def unlockCharacter(self, character, shot):
 		self.characters[character][shot] = True
 
@@ -419,28 +527,27 @@ class gameHandler:
 	def maxRank(self):
 		self.gameController.setRank(32)
 
-	def noFocus(self):
-		self.gameController.setFocusSpeed(self.gameController.getNormalSpeed())
-		self.gameController.setFocusSpeedD(self.gameController.getNormalSpeedD())
+	def canFocus(self, can):
+		self.gameController.setFocus(can)
 
 	def reverseControls(self):
-		self.gameController.setNormalSpeed(self.gameController.getNormalSpeed()+0x0080)
-		self.gameController.setFocusSpeed(self.gameController.getFocusSpeed()+0x0080)
-		self.gameController.setNormalSpeedD(self.gameController.getNormalSpeedD()+0x0080)
-		self.gameController.setFocusSpeedD(self.gameController.getFocusSpeedD()+0x0080)
+		self.gameController.setNormalSpeed(self.gameController.getNormalSpeed()*-1)
+		self.gameController.setFocusSpeed(self.gameController.getFocusSpeed()*-1)
+		self.gameController.setNormalSpeedD(self.gameController.getNormalSpeedD()*-1)
+		self.gameController.setFocusSpeedD(self.gameController.getFocusSpeedD()*-1)
 
 	def ayaSpeed(self):
-		self.gameController.setNormalSpeed(self.gameController.getNormalSpeed()+0x0001)
-		self.gameController.setFocusSpeed(self.gameController.getFocusSpeed()-0x0001)
-		self.gameController.setNormalSpeedD(self.gameController.getNormalSpeedD()+0x0001)
-		self.gameController.setFocusSpeedD(self.gameController.getFocusSpeedD()-0x0001)
+		self.gameController.setNormalSpeed(self.gameController.getNormalSpeed()*4)
+		self.gameController.setFocusSpeed(self.gameController.getFocusSpeed()/4)
+		self.gameController.setNormalSpeedD(self.gameController.getNormalSpeedD()*4)
+		self.gameController.setFocusSpeedD(self.gameController.getFocusSpeedD()/4)
 
 	def freeze(self):
 		self.lastSpeeds = [self.gameController.getNormalSpeed(), self.gameController.getFocusSpeed(), self.gameController.getNormalSpeedD(), self.gameController.getFocusSpeedD()]
-		self.gameController.setNormalSpeed(0x0000)
-		self.gameController.setFocusSpeed(0x0000)
-		self.gameController.setNormalSpeedD(0x0000)
-		self.gameController.setFocusSpeedD(0x0000)
+		self.gameController.setNormalSpeed(0.0)
+		self.gameController.setFocusSpeed(0.0)
+		self.gameController.setNormalSpeedD(0.0)
+		self.gameController.setFocusSpeedD(0.0)
 
 	def resetSpeed(self):
 		self.gameController.setNormalSpeed(self.lastSpeeds[0])
@@ -501,6 +608,12 @@ class gameHandler:
 			for shot in SHOTS:
 				self.hasExtra[character][shot] = False
 
+		self.hasPhantasm = {}
+		for character in CHARACTERS:
+			self.hasPhantasm[character] = {}
+			for shot in SHOTS:
+				self.hasPhantasm[character][shot] = False
+
 		self.difficulties = {LUNATIC: True, HARD: False, NORMAL: False, EASY: False}
 
 		self.characters = {}
@@ -522,6 +635,12 @@ class gameHandler:
 			self.extraBeaten[character] = {}
 			for shot in SHOTS:
 				self.extraBeaten[character][shot] = [False, False]
+
+		self.phantasmBeaten = {}
+		for character in CHARACTERS:
+			self.phantasmBeaten[character] = {}
+			for shot in SHOTS:
+				self.phantasmBeaten[character][shot] = [False, False]
 
 		self.lastSpeeds = [0, 0, 0, 0]
 
@@ -556,8 +675,12 @@ class gameHandler:
 		"""
 		Update the minimum cursor position value authorized.
 		If -1, it will be the lowest difficulty.
+		If -2, it will lock to 1 if the Extra Stage is not unlocked by any character. (For Phantasm select)
 		"""
-		minValue = self.getLowestDifficulty() if minValue == -1 else minValue
+		if minValue == -2:
+			minValue = 1 if not self.canExtra() else 0
+		else:
+			minValue = self.getLowestDifficulty() if minValue == -1 else minValue
 		self.gameController.setDifficultyDown(minValue)
 		self.gameController.setDifficultyUp(minValue)
 

@@ -73,6 +73,14 @@ class gameController:
 	addrSakuyaAExtra = None
 	addrSakuyaBExtra = None
 
+	# Phantasm stage access
+	addrReimuAPhantasm = None
+	addrReimuBPhantasm = None
+	addrMarisaAPhantasm = None
+	addrMarisaBPhantasm = None
+	addrSakuyaAPhantasm = None
+	addrSakuyaBPhantasm = None
+
 	# Practice stage score
 	addrPracticeScore = None
 
@@ -98,6 +106,7 @@ class gameController:
 	addrCharacterLock = None
 	addrForceExtra = None
 	addrDemoCondtion = None
+	addrFocusCondition = None
 
 	# Resources Hack
 	addrLifeHack1 = None
@@ -117,6 +126,10 @@ class gameController:
 	addrDifficultyDown = None
 	addrDifficultyUp = None
 	addrDifficutlyCondition = None
+	addrLastDifficulty = None
+	addrDefaultDifficulty1 = None
+	addrDefaultDifficulty2 = None
+	addrDefaultExtraDifficulty = None
 
 	def __init__(self, pid):
 		self.pm = pymem.Pymem(pid)
@@ -179,6 +192,13 @@ class gameController:
 		self.addrSakuyaAExtra = self.pm.base_address+ADDR_SAKUYA_A_EXTRA
 		self.addrSakuyaBExtra = self.pm.base_address+ADDR_SAKUYA_B_EXTRA
 
+		self.addrReimuAPhantasm = self.pm.base_address+ADDR_REIMU_A_PHANTASM
+		self.addrReimuBPhantasm = self.pm.base_address+ADDR_REIMU_B_PHANTASM
+		self.addrMarisaAPhantasm = self.pm.base_address+ADDR_MARISA_A_PHANTASM
+		self.addrMarisaBPhantasm = self.pm.base_address+ADDR_MARISA_B_PHANTASM
+		self.addrSakuyaAPhantasm = self.pm.base_address+ADDR_SAKUYA_A_PHANTASM
+		self.addrSakuyaBPhantasm = self.pm.base_address+ADDR_SAKUYA_B_PHANTASM
+
 		self.addrControllerHandle = self.pm.base_address+ADDR_CONTROLLER_HANDLER
 		self.addrInput = self.pm.base_address+ADDR_INPUT
 		self.addrGameMode = self.pm.base_address+ADDR_GAME_MODE
@@ -187,15 +207,16 @@ class gameController:
 		self.addrInDemo = self.pm.base_address+ADDR_IN_DEMO
 		self.addrIsBossPresent = self.pm.base_address+ADDR_IS_BOSS_PRESENT
 		self.addrDemoCondtion = self.pm.base_address+ADDR_DEMO_CONDITION
+		self.addrFocusCondition = self.pm.base_address+ADDR_FOCUS_CONDITION
 
 		self.addrKillCondition = self.pm.base_address+ADDR_KILL_CONDITION
 
-		self.addrCharacterLock = [self.pm.base_address+ADDR_LOCK_1, self.pm.base_address+ADDR_LOCK_2, self.pm.base_address+ADDR_LOCK_3, self.pm.base_address+ADDR_LOCK_4, self.pm.base_address+ADDR_LOCK_5, self.pm.base_address+ADDR_LOCK_6]
+		self.addrCharacterLock = [self.pm.base_address+ADDR_LOCK_1, self.pm.base_address+ADDR_LOCK_2, self.pm.base_address+ADDR_LOCK_3, self.pm.base_address+ADDR_LOCK_4]
 
-		# self.addrNormalSpeed = self.pm.base_address+ADDR_NORMAL_SPEED
-		# self.addrFocusSpeed = self.pm.base_address+ADDR_FOCUS_SPEED
-		# self.addrNormalSpeedD = self.pm.base_address+ADDR_NORMAL_SPEED_D
-		# self.addrFocusSpeedD = self.pm.base_address+ADDR_FOCUS_SPEED_D
+		self.addrNormalSpeed = getPointerAddress(self.pm, self.pm.base_address+ADDR_NORMAL_SPEED[0], ADDR_NORMAL_SPEED[1:])
+		self.addrFocusSpeed = getPointerAddress(self.pm, self.pm.base_address+ADDR_FOCUS_SPEED[0], ADDR_FOCUS_SPEED[1:])
+		self.addrNormalSpeedD = getPointerAddress(self.pm, self.pm.base_address+ADDR_NORMAL_SPEED_D[0], ADDR_NORMAL_SPEED_D[1:])
+		self.addrFocusSpeedD = getPointerAddress(self.pm, self.pm.base_address+ADDR_FOCUS_SPEED_D[0], ADDR_FOCUS_SPEED_D[1:])
 
 		self.addrLifeHack1 = self.pm.base_address+ADDR_LIVES_HACK_1
 		self.addrLifeHack2 = self.pm.base_address+ADDR_LIVES_HACK_2
@@ -215,6 +236,10 @@ class gameController:
 		self.addrDifficultyDown = self.pm.base_address+ADDR_DIFFICULTY_DOWN
 		self.addrDifficultyUp = self.pm.base_address+ADDR_DIFFICULTY_UP
 		self.addrDifficutlyCondition = self.pm.base_address+ADDR_DIFFICULTY_CONDITION
+		self.addrLastDifficulty = self.pm.base_address+ADDR_LAST_DIFFICULTY
+		self.addrDefaultDifficulty1 = self.pm.base_address+ADDR_DEFAULT_DIFFICULTY_1
+		self.addrDefaultDifficulty2 = self.pm.base_address+ADDR_DEFAULT_DIFFICULTY_2
+		self.addrDefaultExtraDifficulty = self.pm.base_address+ADDR_DEFAULT_EXTRA_DIFFICULTY
 
 		self.addrPracticeScore = {
 			REIMU:
@@ -493,7 +518,7 @@ class gameController:
 	def getMisses(self):
 		self.addrMisses = getPointerAddress(self.pm, self.pm.base_address+ADDR_MISSES[0], ADDR_MISSES[1:])
 		return int(self.pm.read_float(self.addrMisses))
-	
+
 	def getScore(self):
 		self.addrScore = getPointerAddress(self.pm, self.pm.base_address+ADDR_SCORE[0], ADDR_SCORE[1:])
 		return self.pm.read_int(self.addrScore)
@@ -584,16 +609,20 @@ class gameController:
 		return int.from_bytes(self.pm.read_bytes(self.addrMenuCursor, 1))
 
 	def getNormalSpeed(self):
-		return int.from_bytes(self.pm.read_bytes(self.addrNormalSpeed, 2))
+		self.addrNormalSpeed = getPointerAddress(self.pm, self.pm.base_address+ADDR_NORMAL_SPEED[0], ADDR_NORMAL_SPEED[1:])
+		return self.pm.read_float(self.addrNormalSpeed)
 
 	def getFocusSpeed(self):
-		return int.from_bytes(self.pm.read_bytes(self.addrFocusSpeed, 2))
+		self.addrFocusSpeed = getPointerAddress(self.pm, self.pm.base_address+ADDR_FOCUS_SPEED[0], ADDR_FOCUS_SPEED[1:])
+		return self.pm.read_float(self.addrFocusSpeed)
 
 	def getNormalSpeedD(self):
-		return int.from_bytes(self.pm.read_bytes(self.addrNormalSpeedD, 2))
+		self.addrNormalSpeedD = getPointerAddress(self.pm, self.pm.base_address+ADDR_NORMAL_SPEED_D[0], ADDR_NORMAL_SPEED_D[1:])
+		return self.pm.read_float(self.addrNormalSpeedD)
 
 	def getFocusSpeedD(self):
-		return int.from_bytes(self.pm.read_bytes(self.addrFocusSpeedD, 2))
+		self.addrFocusSpeedD = getPointerAddress(self.pm, self.pm.base_address+ADDR_FOCUS_SPEED_D[0], ADDR_FOCUS_SPEED_D[1:])
+		return self.pm.read_float(self.addrFocusSpeedD)
 
 	def getCustomSoundId(self):
 		return int.from_bytes(self.pm.read_bytes(self.addrCustomSoundId, 1))
@@ -649,7 +678,7 @@ class gameController:
 
 	def setNormalStartingLives(self, newNormalStartingLives):
 		self.pm.write_bytes(self.addrNormalStartingLives, bytes([newNormalStartingLives]), 1)
-	
+
 	def setNormalContinueLives(self, newNormalContinueLives):
 		self.pm.write_bytes(self.addrNormalContinueLives, bytes([newNormalContinueLives]), 1)
 
@@ -683,6 +712,9 @@ class gameController:
 	def setReimuAExtra(self, newReimuAExtra):
 		self.pm.write_bytes(self.addrReimuAExtra, bytes([newReimuAExtra]), 1)
 
+	def setReimuAPhantasm(self, newReimuAPhantasm):
+		self.pm.write_bytes(self.addrReimuAPhantasm, bytes([newReimuAPhantasm]), 1)
+
 	def setReimuBEasy(self, newReimuBEasy):
 		self.pm.write_int(self.addrReimuBEasy, newReimuBEasy)
 
@@ -697,6 +729,9 @@ class gameController:
 
 	def setReimuBExtra(self, newReimuBExtra):
 		self.pm.write_bytes(self.addrReimuBExtra, bytes([newReimuBExtra]), 1)
+
+	def setReimuBPhantasm(self, newReimuBPhantasm):
+		self.pm.write_bytes(self.addrReimuBPhantasm, bytes([newReimuBPhantasm]), 1)
 
 	def setMarisaAEasy(self, newMarisaAEasy):
 		self.pm.write_int(self.addrMarisaAEasy, newMarisaAEasy)
@@ -713,6 +748,9 @@ class gameController:
 	def setMarisaAExtra(self, newMarisaAExtra):
 		self.pm.write_bytes(self.addrMarisaAExtra, bytes([newMarisaAExtra]), 1)
 
+	def setMarisaAPhantasm(self, newMarisaAPhantasm):
+		self.pm.write_bytes(self.addrMarisaAPhantasm, bytes([newMarisaAPhantasm]), 1)
+
 	def setMarisaBEasy(self, newMarisaBEasy):
 		self.pm.write_int(self.addrMarisaBEasy, newMarisaBEasy)
 
@@ -727,6 +765,9 @@ class gameController:
 
 	def setMarisaBExtra(self, newMarisaBExtra):
 		self.pm.write_bytes(self.addrMarisaBExtra, bytes([newMarisaBExtra]), 1)
+
+	def setMarisaBPhantasm(self, newMarisaBPhantasm):
+		self.pm.write_bytes(self.addrMarisaBPhantasm, bytes([newMarisaBPhantasm]), 1)
 
 	def setSakuyaAEasy(self, newSakuyaAEasy):
 		self.pm.write_int(self.addrSakuyaAEasy, newSakuyaAEasy)
@@ -743,6 +784,9 @@ class gameController:
 	def setSakuyaAExtra(self, newSakuyaAExtra):
 		self.pm.write_bytes(self.addrSakuyaAExtra, bytes([newSakuyaAExtra]), 1)
 
+	def setSakuyaAPhantasm(self, newSakuyaAPhantasm):
+		self.pm.write_bytes(self.addrSakuyaAPhantasm, bytes([newSakuyaAPhantasm]), 1)
+
 	def setSakuyaBEasy(self, newSakuyaBEasy):
 		self.pm.write_int(self.addrSakuyaBEasy, newSakuyaBEasy)
 
@@ -757,6 +801,9 @@ class gameController:
 
 	def setSakuyaBExtra(self, newSakuyaBExtra):
 		self.pm.write_bytes(self.addrSakuyaBExtra, bytes([newSakuyaBExtra]), 1)
+
+	def setSakuyaBPhantasm(self, newSakuyaBPhantasm):
+		self.pm.write_bytes(self.addrSakuyaBPhantasm, bytes([newSakuyaBPhantasm]), 1)
 
 	def setFpsText(self, newFpsText):
 		# If we have less than 8 character, we pad space character
@@ -778,6 +825,8 @@ class gameController:
 					self.setReimuALunatic(newValue)
 				elif difficulty == EXTRA:
 					self.setReimuAExtra(newValue)
+				elif difficulty == PHANTASM:
+					self.setReimuAPhantasm(newValue)
 			else:
 				if difficulty == EASY:
 					self.setReimuBEasy(newValue)
@@ -789,6 +838,8 @@ class gameController:
 					self.setReimuBLunatic(newValue)
 				elif difficulty == EXTRA:
 					self.setReimuBExtra(newValue)
+				elif difficulty == PHANTASM:
+					self.setReimuBPhantasm(newValue)
 		elif character == MARISA:
 			if shot == SHOT_A:
 				if difficulty == EASY:
@@ -801,6 +852,8 @@ class gameController:
 					self.setMarisaALunatic(newValue)
 				elif difficulty == EXTRA:
 					self.setMarisaAExtra(newValue)
+				elif difficulty == PHANTASM:
+					self.setMarisaAPhantasm(newValue)
 			else:
 				if difficulty == EASY:
 					self.setMarisaBEasy(newValue)
@@ -812,6 +865,8 @@ class gameController:
 					self.setMarisaBLunatic(newValue)
 				elif difficulty == EXTRA:
 					self.setMarisaBExtra(newValue)
+				elif difficulty == PHANTASM:
+					self.setMarisaBPhantasm(newValue)
 		elif character == SAKUYA:
 			if shot == SHOT_A:
 				if difficulty == EASY:
@@ -824,6 +879,8 @@ class gameController:
 					self.setSakuyaALunatic(newValue)
 				elif difficulty == EXTRA:
 					self.setSakuyaAExtra(newValue)
+				elif difficulty == PHANTASM:
+					self.setSakuyaAPhantasm(newValue)
 			else:
 				if difficulty == EASY:
 					self.setSakuyaBEasy(newValue)
@@ -835,6 +892,8 @@ class gameController:
 					self.setSakuyaBLunatic(newValue)
 				elif difficulty == EXTRA:
 					self.setSakuyaBExtra(newValue)
+				elif difficulty == PHANTASM:
+					self.setSakuyaBPhantasm(newValue)
 
 	def setInput(self, newInput):
 		self.pm.write_bytes(self.addrInput, bytes([newInput]), 1)
@@ -845,17 +904,24 @@ class gameController:
 	def setDifficultyUp(self, difficultyUp):
 		self.pm.write_bytes(self.addrDifficultyUp, bytes([difficultyUp]), 1)
 
+	def setDefaultExtraDifficulty(self, cursor):
+		self.pm.write_bytes(self.addrDefaultExtraDifficulty, bytes([cursor]), 1)
+
 	def setNormalSpeed(self, newNormalSpeed):
-		self.pm.write_bytes(self.addrNormalSpeed, newNormalSpeed.to_bytes(2), 2)
+		self.addrNormalSpeed = getPointerAddress(self.pm, self.pm.base_address+ADDR_NORMAL_SPEED[0], ADDR_NORMAL_SPEED[1:])
+		self.pm.write_float(self.addrNormalSpeed, newNormalSpeed)
 
 	def setFocusSpeed(self, newFocusSpeed):
-		self.pm.write_bytes(self.addrFocusSpeed, newFocusSpeed.to_bytes(2), 2)
+		self.addrFocusSpeed = getPointerAddress(self.pm, self.pm.base_address+ADDR_FOCUS_SPEED[0], ADDR_FOCUS_SPEED[1:])
+		self.pm.write_float(self.addrFocusSpeed, newFocusSpeed)
 
 	def setNormalSpeedD(self, newNormalSpeedD):
-		self.pm.write_bytes(self.addrNormalSpeedD, newNormalSpeedD.to_bytes(2), 2)
+		self.addrNormalSpeedD = getPointerAddress(self.pm, self.pm.base_address+ADDR_NORMAL_SPEED_D[0], ADDR_NORMAL_SPEED_D[1:])
+		self.pm.write_float(self.addrNormalSpeedD, newNormalSpeedD)
 
 	def setFocusSpeedD(self, newFocusSpeedD):
-		self.pm.write_bytes(self.addrFocusSpeedD, newFocusSpeedD.to_bytes(2), 2)
+		self.addrFocusSpeedD = getPointerAddress(self.pm, self.pm.base_address+ADDR_FOCUS_SPEED_D[0], ADDR_FOCUS_SPEED_D[1:])
+		self.pm.write_float(self.addrFocusSpeedD, newFocusSpeedD)
 
 	def resetBossPresent(self):
 		self.pm.write_bytes(self.addrIsBossPresent, bytes([0]), 1)
@@ -871,7 +937,7 @@ class gameController:
 
 	def setLockToAllDifficulty(self):
 		for lock in self.addrCharacterLock:
-			self.pm.write_bytes(lock, bytes([0x90, 0x90]), 2)
+			self.pm.write_bytes(lock, bytes([0x7F]), 1)
 
 	def setControllerHandler(self, activate):
 		if activate:
@@ -911,6 +977,9 @@ class gameController:
 
 	def initDifficultyHack(self):
 		self.pm.write_bytes(self.addrDifficutlyCondition, bytes([0xC6, 0x00]), 2)
+		self.pm.write_bytes(self.addrDefaultDifficulty1, bytes([0x03]), 1)
+		self.pm.write_bytes(self.addrDefaultDifficulty2, bytes([0x03]), 1)
+		self.pm.write_bytes(self.addrLastDifficulty, bytes([0x03]), 1)
 
 	def disableDemo(self):
 		self.pm.write_bytes(self.addrDemoCondtion, bytes([0xE9, 0x79, 0x01, 0x00, 0x00, 0x90]), 6)
@@ -920,3 +989,9 @@ class gameController:
 			self.pm.write_bytes(self.addrFpsUpdate, bytes([0x68, 0xF0, 0xE0, 0x35, 0x01]), 5)
 		else:
 			self.pm.write_bytes(self.addrFpsUpdate, bytes([0x68, 0x9E, 0xF6, 0x62, 0x00]), 5)
+
+	def setFocus(self, active):
+		if active:
+			self.pm.write_bytes(self.addrFocusCondition, bytes([0x0F, 0x84, 0x16, 0x01, 0x00, 0x00]), 6)
+		else:
+			self.pm.write_bytes(self.addrFocusCondition, bytes([0xE9, 0x17, 0x01, 0x00, 0x00, 0x90]), 6)

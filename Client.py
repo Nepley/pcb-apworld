@@ -192,52 +192,62 @@ class TouhouContext(CommonContext):
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 201: # Next Stage
 					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
-					self.handler.addStage(isExtraStageLinear)
+					isPhantasmStageLinear = self.options['phantasm_stage'] == EXTRA_LINEAR
+					self.handler.addStage(isExtraStageLinear, isPhantasmStageLinear)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 202: # [Reimu] Next Stage
 					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
-					self.handler.addStage(isExtraStageLinear, REIMU)
+					isPhantasmStageLinear = self.options['phantasm_stage'] == EXTRA_LINEAR
+					self.handler.addStage(isExtraStageLinear, isPhantasmStageLinear, REIMU)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 203: # [Marisa] Next Stage
 					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
-					self.handler.addStage(isExtraStageLinear, MARISA)
+					isPhantasmStageLinear = self.options['phantasm_stage'] == EXTRA_LINEAR
+					self.handler.addStage(isExtraStageLinear, isPhantasmStageLinear, MARISA)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 204: # [Sakuya] Next Stage
 					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
-					self.handler.addStage(isExtraStageLinear, SAKUYA)
+					isPhantasmStageLinear = self.options['phantasm_stage'] == EXTRA_LINEAR
+					self.handler.addStage(isExtraStageLinear, isPhantasmStageLinear, SAKUYA)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 205: # [Reimu A] Next Stage
 					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
-					self.handler.addStage(isExtraStageLinear, REIMU, SHOT_A)
+					isPhantasmStageLinear = self.options['phantasm_stage'] == EXTRA_LINEAR
+					self.handler.addStage(isExtraStageLinear, isPhantasmStageLinear, REIMU, SHOT_A)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 206: # [Reimu B] Next Stage
 					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
-					self.handler.addStage(isExtraStageLinear, REIMU, SHOT_B)
+					isPhantasmStageLinear = self.options['phantasm_stage'] == EXTRA_LINEAR
+					self.handler.addStage(isExtraStageLinear, isPhantasmStageLinear, REIMU, SHOT_B)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 207: # [Marisa A] Next Stage
 					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
-					self.handler.addStage(isExtraStageLinear, MARISA, SHOT_A)
+					isPhantasmStageLinear = self.options['phantasm_stage'] == EXTRA_LINEAR
+					self.handler.addStage(isExtraStageLinear, isPhantasmStageLinear, MARISA, SHOT_A)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 208: # [Marisa B] Next Stage
 					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
-					self.handler.addStage(isExtraStageLinear, MARISA, SHOT_B)
+					isPhantasmStageLinear = self.options['phantasm_stage'] == EXTRA_LINEAR
+					self.handler.addStage(isExtraStageLinear, isPhantasmStageLinear, MARISA, SHOT_B)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 209: # [Sakuya A] Next Stage
 					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
-					self.handler.addStage(isExtraStageLinear, SAKUYA, SHOT_A)
+					isPhantasmStageLinear = self.options['phantasm_stage'] == EXTRA_LINEAR
+					self.handler.addStage(isExtraStageLinear, isPhantasmStageLinear, SAKUYA, SHOT_A)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 210: # [Sakuya B] Next Stage
 					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
-					self.handler.addStage(isExtraStageLinear, SAKUYA, SHOT_B)
+					isPhantasmStageLinear = self.options['phantasm_stage'] == EXTRA_LINEAR
+					self.handler.addStage(isExtraStageLinear, isPhantasmStageLinear, SAKUYA, SHOT_B)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 200: # 25 Power Point
@@ -304,16 +314,83 @@ class TouhouContext(CommonContext):
 						self.handler.unlockExtraStage(SAKUYA, SHOT_B)
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 221: # Phantasm Stage
+					isPhantasmStageApart = self.options['phantasm_stage'] == EXTRA_APART
+					if isPhantasmStageApart:
+						self.handler.unlockPhantasmStage()
+						gotAnyItem = True
+						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 222: # [Reimu] Phantasm Stage
+					isPhantasmStageApart = self.options['phantasm_stage'] == EXTRA_APART
+					if isPhantasmStageApart:
+						self.handler.unlockPhantasmStage(REIMU)
+						gotAnyItem = True
+						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 223: # [Marisa] Phantasm Stage
+					isPhantasmStageApart = self.options['phantasm_stage'] == EXTRA_APART
+					if isPhantasmStageApart:
+						self.handler.unlockPhantasmStage(MARISA)
+						gotAnyItem = True
+						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 224: # [Sakuya] Phantasm Stage
+					isPhantasmStageApart = self.options['phantasm_stage'] == EXTRA_APART
+					if isPhantasmStageApart:
+						self.handler.unlockPhantasmStage(SAKUYA)
+						gotAnyItem = True
+						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 225: # [Reimu A] Phantasm Stage
+					isPhantasmStageApart = self.options['phantasm_stage'] == EXTRA_APART
+					if isPhantasmStageApart:
+						self.handler.unlockPhantasmStage(REIMU, SHOT_A)
+						gotAnyItem = True
+						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 226: # [Reimu B] Phantasm Stage
+					isPhantasmStageApart = self.options['phantasm_stage'] == EXTRA_APART
+					if isPhantasmStageApart:
+						self.handler.unlockPhantasmStage(REIMU, SHOT_B)
+						gotAnyItem = True
+						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 227: # [Marisa A] Phantasm Stage
+					isPhantasmStageApart = self.options['phantasm_stage'] == EXTRA_APART
+					if isPhantasmStageApart:
+						self.handler.unlockPhantasmStage(MARISA, SHOT_A)
+						gotAnyItem = True
+						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 228: # [Marisa B] Phantasm Stage
+					isPhantasmStageApart = self.options['phantasm_stage'] == EXTRA_APART
+					if isPhantasmStageApart:
+						self.handler.unlockPhantasmStage(MARISA, SHOT_B)
+						gotAnyItem = True
+						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 229: # [Sakuya A] Phantasm Stage
+					isPhantasmStageApart = self.options['phantasm_stage'] == EXTRA_APART
+					if isPhantasmStageApart:
+						self.handler.unlockPhantasmStage(SAKUYA, SHOT_A)
+						gotAnyItem = True
+						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 230: # [Sakuya B] Phantasm Stage
+					isPhantasmStageApart = self.options['phantasm_stage'] == EXTRA_APART
+					if isPhantasmStageApart:
+						self.handler.unlockPhantasmStage(SAKUYA, SHOT_B)
+						gotAnyItem = True
+						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 300 | 301 | 302: # Ending Normal
-					character = REIMU if item_id == 300 else MARISA
+					character = REIMU if item_id == 300 else (MARISA if item_id == 301 else SAKUYA)
 					self.handler.addEnding(character, ENDING_NORMAL)
 					if self.checkVictory():
 						await self.send_msgs([{"cmd": 'StatusUpdate', "status": 30}])
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 303 | 304 | 305: # Ending Extra
-					character = REIMU if item_id == 302 else MARISA
+					character = REIMU if item_id == 303 else (MARISA if item_id == 304 else SAKUYA)
 					self.handler.addEnding(character, ENDING_EXTRA)
+					if self.checkVictory():
+						await self.send_msgs([{"cmd": 'StatusUpdate', "status": 30}])
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 306 | 307 | 308: # Ending Phantasm
+					character = REIMU if item_id == 306 else (MARISA if item_id == 307 else SAKUYA)
+					self.handler.addEnding(character, ENDING_PHANTASM)
 					if self.checkVictory():
 						await self.send_msgs([{"cmd": 'StatusUpdate', "status": 30}])
 					gotAnyItem = True
@@ -424,7 +501,7 @@ class TouhouContext(CommonContext):
 
 		self.handler.updateStageList(mode == PRACTICE_MODE)
 		self.handler.updatePracticeScore(shot_type, difficulty_check)
-	
+
 	def addRingLinkTag(self):
 		self.tags.add("RingLink")
 		asyncio.create_task(self.send_msgs([{"cmd": "ConnectUpdate", "tags": self.tags}]))
@@ -437,14 +514,16 @@ class TouhouContext(CommonContext):
 		type = self.options['ending_required']
 		shot_type = self.options['shot_type']
 		extra = self.options['extra_stage']
+		phantasm = self.options['phantasm_stage']
 
 		if not shot_type and type == ALL_SHOT_TYPE_ENDING:
 			type = ALL_CHARACTER_ENDING
 
 		normal_victory = True
 		extra_victory = True
+		phantasm_victory = True
 
-		if (goal == ENDING_NORMAL or goal == ENDING_BOTH) or extra == NO_EXTRA:
+		if (goal == ENDING_NORMAL or goal == ENDING_ALL) or extra == NO_EXTRA:
 			if type == ONE_ENDING:
 				normal_victory = False
 				for character in CHARACTERS:
@@ -456,7 +535,7 @@ class TouhouContext(CommonContext):
 				for character in CHARACTERS:
 					normal_victory = normal_victory and self.handler.endings[character][ENDING_NORMAL] >= len(SHOTS)
 
-		if (goal == ENDING_EXTRA or goal == ENDING_BOTH) and extra != NO_EXTRA:
+		if (goal == ENDING_EXTRA or goal == ENDING_ALL) and extra != NO_EXTRA:
 			if type == ONE_ENDING:
 				extra_victory = False
 				for character in CHARACTERS:
@@ -468,7 +547,19 @@ class TouhouContext(CommonContext):
 				for character in CHARACTERS:
 					extra_victory = extra_victory and self.handler.endings[character][ENDING_EXTRA] >= len(SHOTS)
 
-		return normal_victory and extra_victory
+		if (goal == ENDING_PHANTASM or goal == ENDING_ALL) and phantasm != NO_EXTRA:
+			if type == ONE_ENDING:
+				phantasm_victory = False
+				for character in CHARACTERS:
+					phantasm_victory = phantasm_victory or self.handler.endings[character][ENDING_EXTRA]
+			elif type == ALL_CHARACTER_ENDING:
+				for character in CHARACTERS:
+					phantasm_victory = phantasm_victory and self.handler.endings[character][ENDING_EXTRA]
+			elif type == ALL_SHOT_TYPE_ENDING:
+				for character in CHARACTERS:
+					phantasm_victory = phantasm_victory and self.handler.endings[character][ENDING_EXTRA] >= len(SHOTS)
+
+		return normal_victory and extra_victory and phantasm_victory
 
 	async def main_loop(self):
 		"""
@@ -489,13 +580,6 @@ class TouhouContext(CommonContext):
 				# If we failed to get the game mode, we skip the loop
 				if gameMode == -2:
 					continue
-
-				# inDemo = self.handler.isInDemo()
-
-				# If we're in the demo, we reset the mode so that the variables in the menu can be reset correctly
-				# if inDemo:
-				# 	currentMode = -1
-				# 	continue
 
 				# Mode Check
 				if(gameMode == IN_GAME and not noCheck):
@@ -576,6 +660,7 @@ class TouhouContext(CommonContext):
 		"""
 		try:
 			mode = self.options['mode']
+			phantasm = self.options['phantasm_stage']
 			while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
 				await asyncio.sleep(0.1)
 				game_mode = self.handler.getGameMode()
@@ -597,15 +682,18 @@ class TouhouContext(CommonContext):
 					# If we're in the difficulty menu, we put the minimal value to the lowest difficulty
 					if menu in [4, 8]:
 						self.minimalCursor = -1
+					# If we're in the Extra difficulty menu
+					elif menu == 12:
+						self.minimalCursor = -2 if phantasm != NO_EXTRA else 0
 					# If we're in the main menu and we play in practice mode, we lock the access to normal mode
 					elif menu == 0 and mode == PRACTICE_MODE:
 						# 1 If we have access to the extra stage, 2 if we don't
-						self.minimalCursor = 1 if self.handler.canExtra() else 2
+						self.minimalCursor = 1 if self.handler.canExtra() or self.handler.canPhantasm() else 2
 					else:
 						self.minimalCursor = 0
 
 					try:
-						self.handler.updateExtraUnlock(not self.ExtraMenu)
+						self.handler.updateExtraUnlock(not self.ExtraMenu, phantasm)
 						self.handler.updateCursor(self.minimalCursor)
 					except Exception as e:
 						pass
@@ -630,6 +718,9 @@ class TouhouContext(CommonContext):
 			counterTransition = 0
 			freezeTimer = 2
 			counterFreeze = 0
+			currentScore = 0
+			currentContinue = 0
+			restarted = False
 			while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
 				await asyncio.sleep(1)
 				game_mode = self.handler.getGameMode()
@@ -637,13 +728,23 @@ class TouhouContext(CommonContext):
 				if game_mode == -2:
 					continue
 
-				if game_mode == IN_GAME and not self.handler.isInDemo():
+				if game_mode == IN_GAME and not restarted:
 					# If we enter a level and some time has passed, we activate the traps
 					if not InLevel and counterTransition < TransitionTimer:
 						counterTransition += 1
 					elif not InLevel:
+						currentScore = 0
+						currentContinue = self.handler.getCurrentContinues()
 						InLevel = True
 						counterTransition = 0
+
+					# We check if the score is correct in order to know if the stage has been restarted
+					if(currentScore <= self.handler.getCurrentScore() or (self.options['mode'] in NORMAL_MODE and currentContinue <= self.handler.getCurrentContinues())):
+						currentScore = self.handler.getCurrentScore()
+						currentContinue = self.handler.getCurrentContinues()
+					else:
+						restarted = True
+						continue
 
 					if InLevel and self.can_trap:
 						# Checks if we need to add a new trap
@@ -675,7 +776,7 @@ class TouhouContext(CommonContext):
 							self.traps['no_focus'] -= 1
 							self.msgQueue.append({"msg": SHORT_TRAP_NAME['no_focus'], "color": RED_TEXT})
 							self.handler.playSound(0x0D)
-							self.handler.noFocus()
+							self.handler.canFocus(False)
 						elif not Freeze and self.traps['freeze'] > 0:
 							Freeze = True
 							self.traps['freeze'] -= 1
@@ -711,6 +812,9 @@ class TouhouContext(CommonContext):
 								counterFreeze = 0
 								self.handler.resetSpeed()
 				else:
+					if NoFocus:
+						self.handler.canFocus(True)
+
 					InLevel = False
 					PowerPointDrain = False
 					MaxRank = False
@@ -721,6 +825,7 @@ class TouhouContext(CommonContext):
 					counterTransition = 0
 					counterFreeze = 0
 					self.can_trap = True
+					restarted = False
 		except Exception as e:
 			print(f"ERROR: {e}")
 			self.inError = True
@@ -916,7 +1021,7 @@ async def game_watcher(ctx: TouhouContext):
 			# We start all the diffrent loops
 			asyncio.create_task(ctx.main_loop())
 			asyncio.create_task(ctx.menu_loop())
-			# asyncio.create_task(ctx.trap_loop())
+			asyncio.create_task(ctx.trap_loop())
 			asyncio.create_task(ctx.message_loop())
 
 			# We update the locations checked if there was any location that was already checked before the connection

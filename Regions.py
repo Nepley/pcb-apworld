@@ -2,7 +2,7 @@ from BaseClasses import MultiWorld, Region
 from .Locations import TLocation, location_table
 from .Variables import *
 
-def get_regions(shot_type, difficulty_check, extra):
+def get_regions(shot_type, difficulty_check, extra, phantasm):
 	regions = {}
 	characters = CHARACTERS_LIST if not shot_type else SHOT_TYPE_LIST
 	regions["Menu"] = {"locations": None, "exits": characters}
@@ -31,6 +31,14 @@ def get_regions(shot_type, difficulty_check, extra):
 
 				for extra_check in EXTRA_CHECKS:
 					regions[f"[{character}] Stage Extra"]["locations"].append(f"[{character}] {extra_check}")
+
+			if phantasm:
+				regions[character]["exits"].append(f"[{character}] Phantasm")
+				regions[f"[{character}] Phantasm"] = {"locations": [], "exits": [f"[{character}] Stage Phantasm"]}
+				regions[f"[{character}] Stage Phantasm"] = {"locations": [f"[{character}] Stage Phantasm Clear"], "exits": None}
+
+				for phantasm_check in PHANTASM_CHECKS:
+					regions[f"[{character}] Stage Phantasm"]["locations"].append(f"[{character}] {phantasm_check}")
 	else:
 		for character in characters:
 			regions[character] = {"locations": None, "exits": [f"[{character}] Early", f"[{character}] Mid", f"[{character}] Late"]}
@@ -51,6 +59,14 @@ def get_regions(shot_type, difficulty_check, extra):
 				regions[f"[{character}] Stage Extra"] = {"locations": [f"[{character}] Stage Extra Clear"], "exits": None}
 				for extra in EXTRA_CHECKS:
 					regions[f"[{character}] Stage Extra"]["locations"].append(f"[{character}] {extra}")
+
+			if phantasm:
+				regions[character]["exits"].append(f"[{character}] Phantasm")
+				regions[f"[{character}] Phantasm"] = {"locations": [], "exits": [f"[{character}] Stage Phantasm"]}
+				regions[f"[{character}] Stage Phantasm"] = {"locations": [f"[{character}] Stage Phantasm Clear"], "exits": None}
+
+				for phantasm_check in PHANTASM_CHECKS:
+					regions[f"[{character}] Stage Phantasm"]["locations"].append(f"[{character}] {phantasm_check}")
 
 		for difficulty in DIFFICULTY_LIST:
 			for character in characters:
@@ -75,8 +91,9 @@ def create_regions(multiworld: MultiWorld, player: int, options):
 	shot_type = getattr(options, "shot_type")
 	difficulty_check = getattr(options, "difficulty_check")
 	extra = getattr(options, "extra_stage")
+	phantasm = getattr(options, "phantasm_stage")
 
-	regions = get_regions(shot_type, difficulty_check, extra)
+	regions = get_regions(shot_type, difficulty_check, extra, phantasm)
 
 	# Set up the regions correctly.
 	for name, data in regions.items():
