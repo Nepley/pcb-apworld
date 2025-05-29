@@ -100,7 +100,6 @@ class gameController:
 	addrGameMode = None
 	addrMenu = None
 	addrMenuCursor = None
-	addrInDemo = None
 	addrIsBossPresent = None
 	addrKillCondition = None
 	addrCharacterLock = None
@@ -204,7 +203,6 @@ class gameController:
 		self.addrGameMode = self.pm.base_address+ADDR_GAME_MODE
 		self.addrMenu = getPointerAddress(self.pm, self.pm.base_address+ADDR_MENU[0], ADDR_MENU[1:])
 		self.addrMenuCursor =  getPointerAddress(self.pm, self.pm.base_address+ADDR_MENU_CURSOR[0], ADDR_MENU_CURSOR[1:])
-		self.addrInDemo = self.pm.base_address+ADDR_IN_DEMO
 		self.addrIsBossPresent = self.pm.base_address+ADDR_IS_BOSS_PRESENT
 		self.addrDemoCondtion = self.pm.base_address+ADDR_DEMO_CONDITION
 		self.addrFocusCondition = self.pm.base_address+ADDR_FOCUS_CONDITION
@@ -597,9 +595,6 @@ class gameController:
 			mode = -2
 
 		return mode
-
-	def getInDemo(self):
-		return int(self.pm.read_float(self.addrInDemo))
 
 	def getMenu(self):
 		self.addrMenu = getPointerAddress(self.pm, self.pm.base_address+ADDR_MENU[0], ADDR_MENU[1:])

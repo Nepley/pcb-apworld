@@ -130,8 +130,8 @@ def connect_regions(multiworld: MultiWorld, player: int, source: str, exits: lis
 	difficultyEnd = getattr(multiworld.worlds[player].options, "difficulty_end")
 	lifeExtra = getattr(multiworld.worlds[player].options, "number_life_extra")
 	bombsExtra = getattr(multiworld.worlds[player].options, "number_bomb_extra")
-	lifeExtra = getattr(multiworld.worlds[player].options, "number_life_phantasm")
-	bombsExtra = getattr(multiworld.worlds[player].options, "number_bomb_phantasm")
+	lifePhantasm = getattr(multiworld.worlds[player].options, "number_life_phantasm")
+	bombsPhantasm = getattr(multiworld.worlds[player].options, "number_bomb_phantasm")
 	mode = getattr(multiworld.worlds[player].options, "mode")
 	extra = getattr(multiworld.worlds[player].options, "extra_stage")
 	phantasm = getattr(multiworld.worlds[player].options, "phantasm_stage")
@@ -148,6 +148,8 @@ def connect_regions(multiworld: MultiWorld, player: int, source: str, exits: lis
 			rule = makeResourcesRule(player, lifeEnd, bombsEnd, difficultyEnd)
 		elif "Extra" in exit and "Stage" not in exit:
 			rule = makeResourcesRule(player, lifeExtra, bombsExtra, 0)
+		elif "Phantasm" in exit and "Stage" not in exit:
+			rule = makeResourcesRule(player, lifePhantasm, bombsPhantasm, 0)
 		elif "Stage" in exit:
 			if "Extra" not in exit and "Phantasm" not in exit:
 				level = int(exit[-1])-1

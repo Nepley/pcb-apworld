@@ -167,27 +167,27 @@ class TouhouContext(CommonContext):
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 100: # Reimu A
-					self.handler.unlockCharacter(0, 0)
+					self.handler.unlockCharacter(REIMU, SHOT_A)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 101: # Reimu B
-					self.handler.unlockCharacter(0, 1)
+					self.handler.unlockCharacter(REIMU, SHOT_B)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 102: # Marisa A
-					self.handler.unlockCharacter(1, 0)
+					self.handler.unlockCharacter(MARISA, SHOT_A)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 103: # Marisa B
-					self.handler.unlockCharacter(1, 1)
+					self.handler.unlockCharacter(MARISA, SHOT_B)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 104: # Sakuya A
-					self.handler.unlockCharacter(2, 0)
+					self.handler.unlockCharacter(SAKUYA, SHOT_A)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 105: # Sakuya B
-					self.handler.unlockCharacter(2, 1)
+					self.handler.unlockCharacter(SAKUYA, SHOT_B)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 201: # Next Stage
@@ -523,7 +523,7 @@ class TouhouContext(CommonContext):
 		extra_victory = True
 		phantasm_victory = True
 
-		if (goal == ENDING_NORMAL or goal == ENDING_ALL) or extra == NO_EXTRA:
+		if (goal == ENDING_NORMAL or goal == ENDING_ALL) or (extra == NO_EXTRA and phantasm == NO_EXTRA):
 			if type == ONE_ENDING:
 				normal_victory = False
 				for character in CHARACTERS:
@@ -551,13 +551,13 @@ class TouhouContext(CommonContext):
 			if type == ONE_ENDING:
 				phantasm_victory = False
 				for character in CHARACTERS:
-					phantasm_victory = phantasm_victory or self.handler.endings[character][ENDING_EXTRA]
+					phantasm_victory = phantasm_victory or self.handler.endings[character][ENDING_PHANTASM]
 			elif type == ALL_CHARACTER_ENDING:
 				for character in CHARACTERS:
-					phantasm_victory = phantasm_victory and self.handler.endings[character][ENDING_EXTRA]
+					phantasm_victory = phantasm_victory and self.handler.endings[character][ENDING_PHANTASM]
 			elif type == ALL_SHOT_TYPE_ENDING:
 				for character in CHARACTERS:
-					phantasm_victory = phantasm_victory and self.handler.endings[character][ENDING_EXTRA] >= len(SHOTS)
+					phantasm_victory = phantasm_victory and self.handler.endings[character][ENDING_PHANTASM] >= len(SHOTS)
 
 		return normal_victory and extra_victory and phantasm_victory
 
@@ -751,51 +751,51 @@ class TouhouContext(CommonContext):
 						if not PowerPointDrain and self.traps['power_point_drain'] > 0:
 							PowerPointDrain = True
 							self.traps['power_point_drain'] -= 1
-							self.msgQueue.append({"msg": SHORT_TRAP_NAME['power_point_drain'], "color": RED_TEXT})
+							self.msgQueue.append({"msg": SHORT_TRAP_NAME['power_point_drain'], "color": BLUE_TEXT})
 							self.handler.playSound(0x1F)
 						elif not MaxRank and self.traps['max_rank'] > 0:
 							MaxRank = True
 							self.traps['max_rank'] -= 1
-							self.msgQueue.append({"msg": SHORT_TRAP_NAME['max_rank'], "color": RED_TEXT})
+							self.msgQueue.append({"msg": SHORT_TRAP_NAME['max_rank'], "color": BLUE_TEXT})
 							self.handler.playSound(0x10)
 							self.handler.maxRank()
 						elif not ReverseControls and self.traps['reverse_control'] > 0:
 							ReverseControls = True
 							self.traps['reverse_control'] -= 1
-							self.msgQueue.append({"msg": SHORT_TRAP_NAME['reverse_control'], "color": RED_TEXT})
+							self.msgQueue.append({"msg": SHORT_TRAP_NAME['reverse_control'], "color": BLUE_TEXT})
 							self.handler.playSound(0x0D)
 							self.handler.reverseControls()
 						elif not AyaSpeed and self.traps['aya_speed'] > 0:
 							AyaSpeed = True
 							self.traps['aya_speed'] -= 1
-							self.msgQueue.append({"msg": SHORT_TRAP_NAME['aya_speed'], "color": RED_TEXT})
+							self.msgQueue.append({"msg": SHORT_TRAP_NAME['aya_speed'], "color": BLUE_TEXT})
 							self.handler.playSound(0x0D)
 							self.handler.ayaSpeed()
 						elif not NoFocus and self.traps['no_focus'] > 0:
 							NoFocus = True
 							self.traps['no_focus'] -= 1
-							self.msgQueue.append({"msg": SHORT_TRAP_NAME['no_focus'], "color": RED_TEXT})
+							self.msgQueue.append({"msg": SHORT_TRAP_NAME['no_focus'], "color": BLUE_TEXT})
 							self.handler.playSound(0x0D)
 							self.handler.canFocus(False)
 						elif not Freeze and self.traps['freeze'] > 0:
 							Freeze = True
 							self.traps['freeze'] -= 1
-							self.msgQueue.append({"msg": SHORT_TRAP_NAME['freeze'], "color": RED_TEXT})
+							self.msgQueue.append({"msg": SHORT_TRAP_NAME['freeze'], "color": BLUE_TEXT})
 							self.handler.playSound(0x0D)
 							self.handler.freeze()
 						elif self.traps['bomb'] > 0:
 							self.traps['bomb'] -= 1
-							self.msgQueue.append({"msg": SHORT_TRAP_NAME['bomb'], "color": RED_TEXT})
+							self.msgQueue.append({"msg": SHORT_TRAP_NAME['bomb'], "color": BLUE_TEXT})
 							self.handler.playSound(0x0E)
 							self.handler.loseBomb()
 						elif self.traps['life'] > 0:
 							self.traps['life'] -= 1
-							self.msgQueue.append({"msg": SHORT_TRAP_NAME['life'], "color": RED_TEXT})
+							self.msgQueue.append({"msg": SHORT_TRAP_NAME['life'], "color": BLUE_TEXT})
 							self.handler.playSound(0x04)
 							self.handler.loseLife()
 						elif self.traps['power_point'] > 0:
 							self.traps['power_point'] -= 1
-							self.msgQueue.append({"msg": SHORT_TRAP_NAME['power_point'], "color": RED_TEXT})
+							self.msgQueue.append({"msg": SHORT_TRAP_NAME['power_point'], "color": BLUE_TEXT})
 							self.handler.playSound(0x1F)
 							self.handler.halfPowerPoint()
 

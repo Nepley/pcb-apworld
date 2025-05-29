@@ -181,7 +181,7 @@ class gameHandler:
 					if self.characters[characters][shots] and (self.hasPhantasm[characters][shots]):
 						self.gameController.setCharacterDifficulty(characters, shots, EXTRA, 99)
 					else:
-						self.gameController.setCharacterDifficulty(characters, shots, EXTRA, 0)
+						self.gameController.setCharacterDifficulty(characters, shots, EXTRA, 1)
 
 		if phantasm:
 			for characters in CHARACTERS:
@@ -375,9 +375,6 @@ class gameHandler:
 	def getDifficulty(self):
 		return self.gameController.getDifficulty()
 
-	def isInDemo(self):
-		return self.gameController.getInDemo() == 1
-
 	def getMisses(self):
 		return self.gameController.getMisses()
 
@@ -412,7 +409,7 @@ class gameHandler:
 		self.gameController.setNormalContinueLives(self.lives)
 		self.gameController.setExtraPhantasmStartingLives(self.lives)
 
-		if addInLevel and self.gameController.getGameMode() == IN_GAME and self.gameController.getInDemo() != 1:
+		if addInLevel and self.gameController.getGameMode() == IN_GAME:
 			self.gameController.setLives(self.gameController.getLives() + 1)
 
 	def addBomb(self, addInLevel = True):
@@ -421,7 +418,7 @@ class gameHandler:
 
 		self.gameController.setStartingBombs(self.bombs)
 
-		if addInLevel and self.gameController.getGameMode() == IN_GAME and self.gameController.getInDemo() != 1:
+		if addInLevel and self.gameController.getGameMode() == IN_GAME:
 			self.gameController.setBombs(self.gameController.getBombs() + 1)
 
 	def add1Power(self, addInLevel = True):
@@ -430,7 +427,7 @@ class gameHandler:
 
 		self.gameController.setStartingPowerPoint(self.power)
 
-		if addInLevel and self.gameController.getGameMode() == IN_GAME and self.gameController.getPower() < 128 and self.gameController.getInDemo() != 1:
+		if addInLevel and self.gameController.getGameMode() == IN_GAME and self.gameController.getPower() < 128:
 			self.gameController.setPower(self.gameController.getPower() + 1)
 
 	def add25Power(self, addInLevel = True):
@@ -441,7 +438,7 @@ class gameHandler:
 
 		self.gameController.setStartingPowerPoint(self.power)
 
-		if addInLevel and self.gameController.getGameMode() == IN_GAME and self.gameController.getInDemo() != 1:
+		if addInLevel and self.gameController.getGameMode() == IN_GAME:
 			if self.gameController.getPower() < 103:
 				self.gameController.setPower(self.gameController.getPower() + 25)
 			else:
@@ -695,7 +692,7 @@ class gameHandler:
 		try:
 			self.gameController.setFpsUpdate(False)
 
-			if color in [WHITE_TEXT, RED_TEXT]:
+			if color in [WHITE_TEXT, BLUE_TEXT]:
 				text_color = False if WHITE_TEXT else True
 				textToDisplay = textToBytes(text, text_color)
 				self.gameController.setFpsText(textToDisplay)
