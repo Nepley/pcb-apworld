@@ -2,7 +2,7 @@ from BaseClasses import MultiWorld, Region
 from .Locations import TLocation, location_table
 from .Variables import *
 
-def get_regions(shot_type, difficulty_check, extra, phantasm):
+def get_regions(shot_type, difficulty_check, extra, phantasm, exclude_lunatic):
 	regions = {}
 	characters = CHARACTERS_LIST if not shot_type else SHOT_TYPE_LIST
 	regions["Menu"] = {"locations": None, "exits": characters}
@@ -69,6 +69,9 @@ def get_regions(shot_type, difficulty_check, extra, phantasm):
 					regions[f"[{character}] Stage Phantasm"]["locations"].append(f"[{character}] {phantasm_check}")
 
 		for difficulty in DIFFICULTY_LIST:
+			if exclude_lunatic and difficulty == "Lunatic":
+				continue
+
 			for character in characters:
 				regions[f"[{character}] Early"]["exits"].append(f"[{difficulty}][{character}] Stage 1")
 				regions[f"[{character}] Early"]["exits"].append(f"[{difficulty}][{character}] Stage 2")
@@ -92,8 +95,9 @@ def create_regions(multiworld: MultiWorld, player: int, options):
 	difficulty_check = getattr(options, "difficulty_check")
 	extra = getattr(options, "extra_stage")
 	phantasm = getattr(options, "phantasm_stage")
+	exclude_lunatic = getattr(options, "exclude_lunatic")
 
-	regions = get_regions(shot_type, difficulty_check, extra, phantasm)
+	regions = get_regions(shot_type, difficulty_check, extra, phantasm, exclude_lunatic)
 
 	# Set up the regions correctly.
 	for name, data in regions.items():

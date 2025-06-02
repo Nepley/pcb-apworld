@@ -46,12 +46,9 @@ class gameHandler:
 	def setDifficulty(self, excludeEasy = False):
 		self.gameController.setDifficulty(self.getLowestDifficulty(excludeEasy))
 
-	def initResources(self, normalMode = False, autoDifficulty = False):
+	def initResources(self, normalMode = False):
 		if normalMode:
 			self.giveContinues()
-
-			if autoDifficulty:
-				self.setDifficulty(True)
 
 	def updateStageList(self, practiceMode = True):
 		for characters in CHARACTERS:
@@ -464,11 +461,8 @@ class gameHandler:
 	def addEnding(self, character, type):
 		self.endings[character][type] += 1
 
-	def unlockDifficulty(self, difficulty, update = False):
+	def unlockDifficulty(self, difficulty):
 		self.difficulties[difficulty] = True
-
-		if update:
-			self.setDifficulty(True)
 
 	def unlockExtraStage(self, character = -1, shot_type = -1):
 		# Unlock for one character/shot type

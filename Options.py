@@ -29,6 +29,10 @@ class StageUnlock(Choice):
 	option_by_character = 1
 	option_by_shot_type = 2
 
+class ExcludeLunatic(Toggle):
+	"""If the Lunatic difficulty is excluded"""
+	display_name = "Exclude Lunatic difficulty"
+
 class NumberLifeMid(Range):
 	"""Number of life the randomizer expect you to have before facing Alice and Prismriver sisters"""
 	display_name = "Number of life expected in order to face Alice and Prismriver sisters"
@@ -270,6 +274,7 @@ class PowerPointDrainTrap(Range):
 game_options: Dict[str, type(Option)] = {
 	"mode": Mode,
 	"stage_unlock": StageUnlock,
+	"exclude_lunatic": ExcludeLunatic,
 	"number_life_mid": NumberLifeMid,
 	"number_bomb_mid": NumberBombsMid,
 	"difficulty_mid": DifficultyMid,

@@ -157,9 +157,8 @@ class TouhouContext(CommonContext):
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 2: # Lower Difficulty
-					updateDifficulty = self.options['mode'] == NORMAL_DYNAMIC_MODE and self.options['difficulty_check'] == NO_DIFFICULTY_CHECK
 					self.difficulties -= 1
-					self.handler.unlockDifficulty(self.difficulties, updateDifficulty)
+					self.handler.unlockDifficulty(self.difficulties)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 3: # 1 Continue
@@ -487,9 +486,8 @@ class TouhouContext(CommonContext):
 		"""
 		Give the resources to the player
 		"""
-		isNormalMode = self.options['mode'] == NORMAL_DYNAMIC_MODE or self.options['mode'] == NORMAL_STATIC_MODE
-		autoDifficulty = self.options['difficulty_check'] == NO_DIFFICULTY_CHECK and self.options['mode'] == NORMAL_DYNAMIC_MODE
-		return self.handler.initResources(isNormalMode, autoDifficulty)
+		isNormalMode = self.options['mode'] == NORMAL_STATIC_MODE
+		return self.handler.initResources(isNormalMode)
 
 	def updateStageList(self):
 		"""
@@ -661,6 +659,12 @@ class TouhouContext(CommonContext):
 		try:
 			mode = self.options['mode']
 			phantasm = self.options['phantasm_stage']
+			exclude_lunatic = self.options['exclude_lunatic']
+
+			if exclude_lunatic and self.difficulties == LUNATIC:
+				self.difficulties = HARD
+				self.handler.unlockDifficulty(self.difficulties)
+
 			while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
 				await asyncio.sleep(0.1)
 				game_mode = self.handler.getGameMode()
