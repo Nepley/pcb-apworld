@@ -86,7 +86,10 @@ def get_regions(shot_type, difficulty_check, extra, phantasm, exclude_lunatic):
 					level += 1
 					if level > 6 or (level > 5 and difficulty == "Easy"):
 						continue
-					regions[f"[{difficulty}][{character}] Stage {level}"] = {"locations": [f"[{difficulty}][{character}] {stage[0]}", f"[{difficulty}][{character}] {stage[1]}"], "exits": None}
+
+					regions[f"[{difficulty}][{character}] Stage {level}"] = {"locations": [], "exits": None}
+					for check in stage:
+						regions[f"[{difficulty}][{character}] Stage {level}"]["locations"].append(f"[{difficulty}][{character}] {check}")
 
 	return regions
 

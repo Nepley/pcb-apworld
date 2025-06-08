@@ -48,7 +48,6 @@ class TWorld(World):
 		shot_type = getattr(self.options, "shot_type")
 		difficulty_check = getattr(self.options, "difficulty_check")
 		traps = getattr(self.options, "traps")
-		max_rank_trap = getattr(self.options, "max_rank_trap")
 		power_point_trap = getattr(self.options, "power_point_trap")
 		bomb_trap = getattr(self.options, "bomb_trap")
 		life_trap = getattr(self.options, "life_trap")
@@ -241,7 +240,7 @@ class TWorld(World):
 			number_traps = int(remaining_locations * traps / 100)
 
 			if number_traps > 0:
-				trapList = self.random.choices(["Max Rank", "-50% Power Point", "-1 Bomb", "-1 Life", "No Focus", "Reverse Movement", "Aya Speed", "Freeze", "Power Point Drain"], weights=[max_rank_trap, power_point_trap, bomb_trap, life_trap, no_focus_trap, reverse_movement_trap, aya_speed_trap, freeze_trap, power_point_drain_trap], k=number_traps)
+				trapList = self.random.choices(["-50% Power Point", "-1 Bomb", "-1 Life", "No Focus", "Reverse Movement", "Aya Speed", "Freeze", "Power Point Drain"], weights=[power_point_trap, bomb_trap, life_trap, no_focus_trap, reverse_movement_trap, aya_speed_trap, freeze_trap, power_point_drain_trap], k=number_traps)
 				for trap in trapList:
 					item_pool.append(self.create_item(trap))
 

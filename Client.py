@@ -47,7 +47,7 @@ class TouhouContext(CommonContext):
 
 		# Counter
 		self.difficulties = 3
-		self.traps = {"power_point_drain": 0, "max_rank": 0, "no_focus": 0, "reverse_control": 0, "aya_speed": 0, "freeze": 0, "bomb": 0, "life": 0, "power_point": 0}
+		self.traps = {"power_point_drain": 0, "no_focus": 0, "reverse_control": 0, "aya_speed": 0, "freeze": 0, "bomb": 0, "life": 0, "power_point": 0}
 		self.can_trap = True
 
 		self.options = None
@@ -398,23 +398,21 @@ class TouhouContext(CommonContext):
 					self.handler.add1Power()
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 500: # Max Rank
-					self.traps["max_rank"] += 1
-				case 501: # -50% Power Point
+				case 500: # -50% Power Point
 					self.traps["power_point"] += 1
-				case 502: # -1 Bomb
+				case 501: # -1 Bomb
 					self.traps["bomb"] += 1
-				case 503: # -1 Life
+				case 502: # -1 Life
 					self.traps["life"] += 1
-				case 504: # No Focus
+				case 503: # No Focus
 					self.traps["no_focus"] += 1
-				case 505: # Reverse Movement
+				case 504: # Reverse Movement
 					self.traps["reverse_control"] += 1
-				case 506: # Aya Speed
+				case 505: # Aya Speed
 					self.traps["aya_speed"] += 1
-				case 507: # Freeze
+				case 506: # Freeze
 					self.traps["freeze"] += 1
-				case 508: # Power Point Drain
+				case 507: # Power Point Drain
 					self.traps["power_point_drain"] += 1
 				case _:
 					print(f"Unknown Item: {item}")
@@ -439,12 +437,6 @@ class TouhouContext(CommonContext):
 				# If we are in normal mode, the extra stage is set to linear and the stage 6 has just been cleared. We unlock it if it's not already.
 				if not self.handler.canExtra() and self.options['mode'] in NORMAL_MODE and self.options['extra_stage'] == EXTRA_LINEAR and id in self.final_stage_location_ids:
 					self.handler.unlockExtraStage()
-			# If the location is not checked but it was marked as checked, we set it as beaten (For exemple, when the client is reconnected)
-			elif id in self.previous_location_checked and not self.handler.isBossBeaten(*map):
-				# If the difficulty of the location is at -1 but we have difficulty check, we do not set this locations to not cause any problem
-				# Same thing for the shot type
-				if (not self.options['difficulty_check'] or map[-1] != -1) and (not self.options['shot_type'] or map[-2] != -1):
-					self.handler.setBossBeaten(*map)
 
 		# If we have new locations, we send them to the server and add them to the list of checked locations
 		if new_locations:
@@ -493,12 +485,10 @@ class TouhouContext(CommonContext):
 		"""
 		Update the stage list in practice mode
 		"""
-		shot_type = self.options['shot_type']
-		difficulty_check = self.options['difficulty_check'] in DIFFICULTY_CHECK
 		mode = self.options['mode']
 
 		self.handler.updateStageList(mode == PRACTICE_MODE)
-		self.handler.updatePracticeScore(shot_type, difficulty_check)
+		self.handler.updatePracticeScore(self.location_mapping, self.previous_location_checked)
 
 	def addRingLinkTag(self):
 		self.tags.add("RingLink")
@@ -661,8 +651,8 @@ class TouhouContext(CommonContext):
 			phantasm = self.options['phantasm_stage']
 			exclude_lunatic = self.options['exclude_lunatic']
 
-			if exclude_lunatic and self.difficulties == LUNATIC:
-				self.difficulties = HARD
+			if exclude_lunatic:
+				self.difficulties -= 1
 				self.handler.unlockDifficulty(self.difficulties)
 
 			while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
@@ -712,7 +702,6 @@ class TouhouContext(CommonContext):
 
 		try:
 			PowerPointDrain = False
-			MaxRank = False
 			NoFocus = False
 			ReverseControls = False
 			AyaSpeed = False
@@ -757,12 +746,6 @@ class TouhouContext(CommonContext):
 							self.traps['power_point_drain'] -= 1
 							self.msgQueue.append({"msg": SHORT_TRAP_NAME['power_point_drain'], "color": BLUE_TEXT})
 							self.handler.playSound(0x1F)
-						elif not MaxRank and self.traps['max_rank'] > 0:
-							MaxRank = True
-							self.traps['max_rank'] -= 1
-							self.msgQueue.append({"msg": SHORT_TRAP_NAME['max_rank'], "color": BLUE_TEXT})
-							self.handler.playSound(0x10)
-							self.handler.maxRank()
 						elif not ReverseControls and self.traps['reverse_control'] > 0:
 							ReverseControls = True
 							self.traps['reverse_control'] -= 1
@@ -821,7 +804,6 @@ class TouhouContext(CommonContext):
 
 					InLevel = False
 					PowerPointDrain = False
-					MaxRank = False
 					NoFocus = False
 					ReverseControls = False
 					AyaSpeed = False
@@ -830,6 +812,7 @@ class TouhouContext(CommonContext):
 					counterFreeze = 0
 					self.can_trap = True
 					restarted = False
+					currentScore = 0
 		except Exception as e:
 			print(f"ERROR: {e}")
 			self.inError = True

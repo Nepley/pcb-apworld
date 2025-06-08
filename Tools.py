@@ -93,6 +93,11 @@ def getLocationMapping(shot_type, difficulty):
 					valid_location = True
 					break
 
+			for check in PHANTASM_CHECKS:
+				if location.endswith(check):
+					valid_location = True
+					break
+
 		# If it's not, we filter the difficulty
 		if not valid_location:
 			found = False

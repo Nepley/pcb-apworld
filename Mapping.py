@@ -245,20 +245,18 @@ SHORT_ITEM_NAME = {
 	307: "Ending P",
 	308: "Ending P",
 	400: "+1 PP",
-	500: "Max Rank",
-	501: "-50% PP",
-	502: "-1 Bomb",
-	503: "-1 Life",
-	504: "No Focus",
-	505: "Reverse",
-	506: "Aya Sp.",
-	507: "Freeze",
-	508: "PP Drain"
+	500: "-50% PP",
+	501: "-1 Bomb",
+	502: "-1 Life",
+	503: "No Focus",
+	504: "Reverse",
+	505: "Aya Sp.",
+	506: "Freeze",
+	507: "PP Drain"
 }
 
 # Trap name with less than 8 characters
 SHORT_TRAP_NAME = {
-	"max_rank": "Max Rank",
 	"power_point": "-50% PP",
 	"bomb": "-1 Bomb",
 	"life": "-1 Life",

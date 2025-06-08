@@ -84,13 +84,12 @@ item_table: Dict[str, TItemData] = {
 	"+1 Power Point":	TItemData("Filler", STARTING_ID + 400),
 
 	# Trap
-	"Max Rank":				TItemData("Traps", STARTING_ID + 500, ItemClassification.trap),
-	"-50% Power Point":		TItemData("Traps", STARTING_ID + 501, ItemClassification.trap),
-	"-1 Bomb":				TItemData("Traps", STARTING_ID + 502, ItemClassification.trap),
-	"-1 Life":				TItemData("Traps", STARTING_ID + 503, ItemClassification.trap),
-	"No Focus":				TItemData("Traps", STARTING_ID + 504, ItemClassification.trap),
-	"Reverse Movement":		TItemData("Traps", STARTING_ID + 505, ItemClassification.trap),
-	"Aya Speed":			TItemData("Traps", STARTING_ID + 506, ItemClassification.trap),
-	"Freeze":				TItemData("Traps", STARTING_ID + 507, ItemClassification.trap),
-	"Power Point Drain":	TItemData("Traps", STARTING_ID + 508, ItemClassification.trap),
+	"-50% Power Point":		TItemData("Traps", STARTING_ID + 500, ItemClassification.trap),
+	"-1 Bomb":				TItemData("Traps", STARTING_ID + 501, ItemClassification.trap),
+	"-1 Life":				TItemData("Traps", STARTING_ID + 502, ItemClassification.trap),
+	"No Focus":				TItemData("Traps", STARTING_ID + 503, ItemClassification.trap),
+	"Reverse Movement":		TItemData("Traps", STARTING_ID + 504, ItemClassification.trap),
+	"Aya Speed":			TItemData("Traps", STARTING_ID + 505, ItemClassification.trap),
+	"Freeze":				TItemData("Traps", STARTING_ID + 506, ItemClassification.trap),
+	"Power Point Drain":	TItemData("Traps", STARTING_ID + 507, ItemClassification.trap),
 }

@@ -181,16 +181,6 @@ class Traps(Range):
 	range_end = 100
 	default = 0
 
-class MaxRankTrap(Range):
-	"""
-	Weight of the max rank trap.
-    This trap max out the rank difficulty (32)
-	"""
-	display_name = "Max rank trap"
-	range_start = 0
-	range_end = 100
-	default = 30
-
 class PowerPointTrap(Range):
 	"""
 	Weight of the -50% power point trap.
@@ -294,7 +284,6 @@ game_options: Dict[str, type(Option)] = {
 	"death_link": DeathLink,
 	"ring_link": RingLink,
 	"traps": Traps,
-	"max_rank_trap": MaxRankTrap,
 	"power_point_trap": PowerPointTrap,
 	"bomb_trap": BombTrap,
 	"life_trap": LifeTrap,
