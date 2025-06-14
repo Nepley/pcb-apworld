@@ -30,7 +30,7 @@ Each item will make it easier and easier to clear the differents stages.
 With Practice mode, you play stage by stage individually and need to unlock the stages progressively. You can also choose how the stage unlock are grouped (Globally, By character or By Shot Type)<br />
 In Normal mode, you need to finish the game normally with the resources only given at the start. Futhermore, only the resources act as a gate. If you put everything at minimum in the yaml, the logic consider you can finish at sphere 1.
 
-**Exclude Lunatic** You can exclude the Lunatic difficulty and therefore, start with the Hard difficulty.
+**Exclude Lunatic:** You can exclude the Lunatic difficulty and therefore, start with the Hard difficulty.
 
 **Resources:** You can set the resources needed for the stages 3/4 and stages 5/6.
 
@@ -48,9 +48,9 @@ In Normal mode, you need to finish the game normally with the resources only giv
 
 **Traps:** You can choose to have traps replacing a percentages of filler items. You can set the weight of each individual trap.
 
-**Death Link** You can choose to activate Death Link.
+**Death Link:** You can choose to activate Death Link.
 
-**Ring Link** You can choose to activate Ring Link, synchronizing your gain and loss of Power Points.
+**Ring Link:** You can choose to activate Ring Link, synchronizing your gain and loss of Power Points.
 
 ## How to use
 
