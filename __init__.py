@@ -42,6 +42,7 @@ class TWorld(World):
 		mode = getattr(self.options, "mode")
 		stage_unlock = getattr(self.options, "stage_unlock")
 		exclude_lunatic = getattr(self.options, "exclude_lunatic")
+		cherry_border = getattr(self.options, "cherry_border")
 		extra = getattr(self.options, "extra_stage")
 		phantasm = getattr(self.options, "phantasm_stage")
 		goal = getattr(self.options, "goal")
@@ -56,6 +57,7 @@ class TWorld(World):
 		aya_speed_trap = getattr(self.options, "aya_speed_trap")
 		freeze_trap = getattr(self.options, "freeze_trap")
 		power_point_drain_trap = getattr(self.options, "power_point_drain_trap")
+		no_cherry_trap = getattr(self.options, "no_cherry_trap")
 
 		for name, data in item_table.items():
 			quantity = data.max_quantity
@@ -104,6 +106,13 @@ class TWorld(World):
 			# If Lunatic is excluded, we remove one Lower difficulty
 			if data.category == "Items" and name == "Lower Difficulty" and exclude_lunatic:
 				quantity -= 1
+
+			# For cherry border, we remove it if it's not randomized, or set the quantity to 1 if it's not progressive
+			if data.category == "Cherry":
+				if cherry_border != CHERRY_BORDER_NOT_RANDOMIZED:
+					quantity = 1 if cherry_border == CHERRY_BORDER_RANDOMIZED else quantity
+				else:
+					continue
 
 			item_pool += [self.create_item(name) for _ in range(0, quantity)]
 
@@ -240,7 +249,7 @@ class TWorld(World):
 			number_traps = int(remaining_locations * traps / 100)
 
 			if number_traps > 0:
-				trapList = self.random.choices(["-50% Power Point", "-1 Bomb", "-1 Life", "No Focus", "Reverse Movement", "Aya Speed", "Freeze", "Power Point Drain"], weights=[power_point_trap, bomb_trap, life_trap, no_focus_trap, reverse_movement_trap, aya_speed_trap, freeze_trap, power_point_drain_trap], k=number_traps)
+				trapList = self.random.choices(["-50% Power Point", "-1 Bomb", "-1 Life", "No Focus", "Reverse Movement", "Aya Speed", "Freeze", "Power Point Drain", "No Cherry"], weights=[power_point_trap, bomb_trap, life_trap, no_focus_trap, reverse_movement_trap, aya_speed_trap, freeze_trap, power_point_drain_trap, no_cherry_trap], k=number_traps)
 				for trap in trapList:
 					item_pool.append(self.create_item(trap))
 

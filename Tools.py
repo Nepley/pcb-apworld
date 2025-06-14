@@ -180,8 +180,8 @@ def getLocationMapping(shot_type, difficulty):
 	return mapping, final_stage_id
 
 def getPointerAddress(pm, base, offsets):
-    address = base
-    for offset in offsets[:-1]:
-        address = pm.read_uint(address)
-        address += offset
-    return pm.read_uint(address) + offsets[-1]
+	address = base
+	for offset in offsets[:-1]:
+		address = pm.read_uint(address)
+		address += offset
+	return pm.read_uint(address) + offsets[-1]

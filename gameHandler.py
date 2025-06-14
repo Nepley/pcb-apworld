@@ -11,6 +11,7 @@ class gameHandler:
 	endings = None
 	stages = None
 	continues = None
+	cherry = None
 
 	difficulties = None
 	characters = None
@@ -407,6 +408,20 @@ class gameHandler:
 			else:
 				self.gameController.setPower(128)
 
+	def giveCherryBorder(self):
+		self.cherry += 1
+
+		# We cap it at 6
+		if self.cherry > 6:
+			self.cherry = 6
+
+		# If it's the first, we unlock the Cherry Border
+		if self.cherry == 1:
+			self.gameController.setCanGetCherry(True)
+		else:
+			cherryMax = 50000 - ((self.cherry-1) * 5000)
+			self.gameController.setCherryPlusMax(cherryMax)
+
 	def addStage(self, extra = False, phantasm = False, character = -1, shot_type = -1):
 		character_list = [character] if character > -1 else CHARACTERS
 		shot_type_list = [shot_type] if shot_type > -1 else SHOTS
@@ -504,6 +519,10 @@ class gameHandler:
 		self.gameController.setNormalSpeedD(0.0)
 		self.gameController.setFocusSpeedD(0.0)
 
+	def noCherry(self):
+		self.gameController.setCherry(0)
+		self.gameController.setCherryPlus(0)
+
 	def resetSpeed(self):
 		self.gameController.setNormalSpeed(self.lastSpeeds[0])
 		self.gameController.setFocusSpeed(self.lastSpeeds[1])
@@ -519,6 +538,8 @@ class gameHandler:
 		self.initGame()
 
 	def initGame(self):
+		self.gameController.initAntiTemperHack()
+
 		self.gameController.initStartingLives()
 		self.gameController.initStartingBombs()
 		self.gameController.initPowerHack()
@@ -529,6 +550,7 @@ class gameHandler:
 		self.gameController.setNormalContinueLives(self.lives)
 		self.gameController.setStartingBombs(self.bombs)
 		self.gameController.setStartingPowerPoint(self.power)
+		self.gameController.setCanGetCherry(False)
 
 		self.gameController.initSoundHack()
 		self.gameController.initDifficultyHack()
@@ -544,6 +566,7 @@ class gameHandler:
 		self.bombs = 0
 		self.power = 0
 		self.continues = 0
+		self.cherry = 0
 
 		self.stages = {}
 		for character in CHARACTERS:
@@ -688,3 +711,10 @@ class gameHandler:
 			possible = False
 
 		return possible
+
+	def shortStage4(self):
+		"""
+		Shorten the stage 4 by starting to the midboss
+		"""
+		if self.gameController.getStage() == 4:
+			self.gameController.setTime(7000)

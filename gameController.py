@@ -30,6 +30,14 @@ class gameController:
 	addrStartingBombs = None
 	addrStartingPowerPoint = None
 
+	#Cherry
+	addrBaseCherry = None
+	addrCherry = None
+	addrCherryPlus = None
+	addrCherryPlusMax = None
+	addrCherryGiveLine = None
+	addrCherryPlusGiveLine = None
+
 	# Stats
 	addrMisses = None
 	addrScore = None
@@ -106,6 +114,7 @@ class gameController:
 	addrForceExtra = None
 	addrDemoCondtion = None
 	addrFocusCondition = None
+	addrAntiTemperHack = None
 
 	# Resources Hack
 	addrLifeHack1 = None
@@ -130,6 +139,10 @@ class gameController:
 	addrDefaultDifficulty2 = None
 	addrDefaultExtraDifficulty = None
 
+	# Time
+	addrTime1 = None
+	addrTime2 = None
+
 	def __init__(self, pid):
 		self.pm = pymem.Pymem(pid)
 
@@ -150,6 +163,13 @@ class gameController:
 		self.addrExtraPhantasmStartingLives = self.pm.base_address+ADDR_EXTRA_PHANTASM_STARTING_LIVES
 		self.addrStartingBombs = self.pm.base_address+ADDR_STARTING_BOMBS
 		self.addrStartingPowerPoint = self.pm.base_address+ADDR_STARTING_POWER_POINT
+
+		self.addrBaseCherry = getPointerAddress(self.pm, self.pm.base_address+ADDR_BASE_CHERRY[0], ADDR_BASE_CHERRY[1:])
+		self.addrCherry = self.pm.base_address+ADDR_CHERRY
+		self.addrCherryPlus = self.pm.base_address+ADDR_CHERRY_PLUS
+		self.addrCherryPlusMax = self.pm.base_address+ADDR_CHERRY_PLUS_MAX
+		self.addrCherryGiveLine = self.pm.base_address+ADDR_CHERRY_GIVE_LINE
+		self.addrCherryPlusGiveLine = self.pm.base_address+ADDR_CHERRY_PLUS_GIVE_LINE
 
 		self.addrMisses = getPointerAddress(self.pm, self.pm.base_address+ADDR_MISSES[0], ADDR_MISSES[1:])
 		self.addrScore = getPointerAddress(self.pm, self.pm.base_address+ADDR_SCORE[0], ADDR_SCORE[1:])
@@ -206,6 +226,7 @@ class gameController:
 		self.addrIsBossPresent = self.pm.base_address+ADDR_IS_BOSS_PRESENT
 		self.addrDemoCondtion = self.pm.base_address+ADDR_DEMO_CONDITION
 		self.addrFocusCondition = self.pm.base_address+ADDR_FOCUS_CONDITION
+		self.addrAntiTemperHack = self.pm.base_address+ADDR_ANTI_TEMPER_HACK
 
 		self.addrKillCondition = self.pm.base_address+ADDR_KILL_CONDITION
 
@@ -238,6 +259,9 @@ class gameController:
 		self.addrDefaultDifficulty1 = self.pm.base_address+ADDR_DEFAULT_DIFFICULTY_1
 		self.addrDefaultDifficulty2 = self.pm.base_address+ADDR_DEFAULT_DIFFICULTY_2
 		self.addrDefaultExtraDifficulty = self.pm.base_address+ADDR_DEFAULT_EXTRA_DIFFICULTY
+
+		self.addrTime1 = getPointerAddress(self.pm, self.pm.base_address+ADDR_TIME_1[0], ADDR_TIME_1[1:])
+		self.addrTime2 = getPointerAddress(self.pm, self.pm.base_address+ADDR_TIME_2[0], ADDR_TIME_2[1:])
 
 		self.addrPracticeScore = {
 			REIMU:
@@ -692,6 +716,19 @@ class gameController:
 	def setMisses(self, newMisses):
 		self.pm.write_short(self.addrMisses, newMisses)
 
+	def setCherry(self, newCherry):
+		self.addrBaseCherry = getPointerAddress(self.pm, self.pm.base_address+ADDR_BASE_CHERRY[0], ADDR_BASE_CHERRY[1:])
+		base = self.pm.read_int(self.addrBaseCherry)
+		self.pm.write_int(self.addrCherry, base+newCherry)
+
+	def setCherryPlus(self, newCherryPlus):
+		self.addrBaseCherry = getPointerAddress(self.pm, self.pm.base_address+ADDR_BASE_CHERRY[0], ADDR_BASE_CHERRY[1:])
+		base = self.pm.read_int(self.addrBaseCherry)
+		self.pm.write_int(self.addrCherryPlus, base+newCherryPlus)
+
+	def setCherryPlusMax(self, newCherryPlusMax):
+		self.pm.write_int(self.addrCherryPlusMax, newCherryPlusMax)
+
 	def setReimuAEasy(self, newReimuAEasy):
 		self.pm.write_int(self.addrReimuAEasy, newReimuAEasy)
 
@@ -940,6 +977,12 @@ class gameController:
 		else:
 			self.pm.write_bytes(self.addrControllerHandle, bytes([0x90, 0x90, 0x90, 0x90, 0x90, 0x90]), 6)
 
+	def setTime(self, time):
+		self.addrTime1 = getPointerAddress(self.pm, self.pm.base_address+ADDR_TIME_1[0], ADDR_TIME_1[1:])
+		self.addrTime2 = getPointerAddress(self.pm, self.pm.base_address+ADDR_TIME_2[0], ADDR_TIME_2[1:])
+		self.pm.write_int(self.addrTime1, time)
+		self.pm.write_int(self.addrTime2, time)
+
 	def initSoundHack(self):
 		soundIdHex = hex(self.addrCustomSoundId)[2:]
 		soundId = [int(soundIdHex[i:i+2], 16) for i in range(0, len(soundIdHex), 2)]
@@ -976,6 +1019,9 @@ class gameController:
 		self.pm.write_bytes(self.addrDefaultDifficulty2, bytes([0x03]), 1)
 		self.pm.write_bytes(self.addrLastDifficulty, bytes([0x03]), 1)
 
+	def initAntiTemperHack(self):
+		self.pm.write_bytes(self.addrAntiTemperHack, bytes([0x33, 0xC0, 0xC3]), 3)
+
 	def disableDemo(self):
 		self.pm.write_bytes(self.addrDemoCondtion, bytes([0xE9, 0x79, 0x01, 0x00, 0x00, 0x90]), 6)
 
@@ -990,3 +1036,11 @@ class gameController:
 			self.pm.write_bytes(self.addrFocusCondition, bytes([0x0F, 0x84, 0x16, 0x01, 0x00, 0x00]), 6)
 		else:
 			self.pm.write_bytes(self.addrFocusCondition, bytes([0xE9, 0x17, 0x01, 0x00, 0x00, 0x90]), 6)
+
+	def setCanGetCherry(self, can):
+		if can:
+			self.pm.write_bytes(self.addrCherryGiveLine, bytes([0x89, 0x81, 0x1C, 0x96, 0x00, 0x00]), 6)
+			self.pm.write_bytes(self.addrCherryPlusGiveLine, bytes([0x89, 0x81, 0x20, 0x96, 0x00, 0x00]), 6)
+		else:
+			self.pm.write_bytes(self.addrCherryGiveLine, bytes([0x90, 0x90, 0x90, 0x90, 0x90, 0x90]), 6)
+			self.pm.write_bytes(self.addrCherryPlusGiveLine, bytes([0x90, 0x90, 0x90, 0x90, 0x90, 0x90]), 6)

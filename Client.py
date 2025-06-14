@@ -47,7 +47,7 @@ class TouhouContext(CommonContext):
 
 		# Counter
 		self.difficulties = 3
-		self.traps = {"power_point_drain": 0, "no_focus": 0, "reverse_control": 0, "aya_speed": 0, "freeze": 0, "bomb": 0, "life": 0, "power_point": 0}
+		self.traps = {"power_point_drain": 0, "no_focus": 0, "reverse_control": 0, "aya_speed": 0, "freeze": 0, "bomb": 0, "life": 0, "power_point": 0, "no_cherry": 0}
 		self.can_trap = True
 
 		self.options = None
@@ -165,6 +165,15 @@ class TouhouContext(CommonContext):
 					self.handler.addContinue()
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 4: # 25 Power Point
+					self.handler.add25Power()
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 5: # Cherry Border
+					if self.options['cherry_border'] != CHERRY_BORDER_NOT_RANDOMIZED:
+						self.handler.giveCherryBorder()
+						gotAnyItem = True
+						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 100: # Reimu A
 					self.handler.unlockCharacter(REIMU, SHOT_A)
 					gotAnyItem = True
@@ -189,185 +198,181 @@ class TouhouContext(CommonContext):
 					self.handler.unlockCharacter(SAKUYA, SHOT_B)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 201: # Next Stage
+				case 200: # Next Stage
 					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
 					isPhantasmStageLinear = self.options['phantasm_stage'] == EXTRA_LINEAR
 					self.handler.addStage(isExtraStageLinear, isPhantasmStageLinear)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 202: # [Reimu] Next Stage
+				case 201: # [Reimu] Next Stage
 					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
 					isPhantasmStageLinear = self.options['phantasm_stage'] == EXTRA_LINEAR
 					self.handler.addStage(isExtraStageLinear, isPhantasmStageLinear, REIMU)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 203: # [Marisa] Next Stage
+				case 202: # [Marisa] Next Stage
 					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
 					isPhantasmStageLinear = self.options['phantasm_stage'] == EXTRA_LINEAR
 					self.handler.addStage(isExtraStageLinear, isPhantasmStageLinear, MARISA)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 204: # [Sakuya] Next Stage
+				case 203: # [Sakuya] Next Stage
 					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
 					isPhantasmStageLinear = self.options['phantasm_stage'] == EXTRA_LINEAR
 					self.handler.addStage(isExtraStageLinear, isPhantasmStageLinear, SAKUYA)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 205: # [Reimu A] Next Stage
+				case 204: # [Reimu A] Next Stage
 					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
 					isPhantasmStageLinear = self.options['phantasm_stage'] == EXTRA_LINEAR
 					self.handler.addStage(isExtraStageLinear, isPhantasmStageLinear, REIMU, SHOT_A)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 206: # [Reimu B] Next Stage
+				case 205: # [Reimu B] Next Stage
 					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
 					isPhantasmStageLinear = self.options['phantasm_stage'] == EXTRA_LINEAR
 					self.handler.addStage(isExtraStageLinear, isPhantasmStageLinear, REIMU, SHOT_B)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 207: # [Marisa A] Next Stage
+				case 206: # [Marisa A] Next Stage
 					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
 					isPhantasmStageLinear = self.options['phantasm_stage'] == EXTRA_LINEAR
 					self.handler.addStage(isExtraStageLinear, isPhantasmStageLinear, MARISA, SHOT_A)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 208: # [Marisa B] Next Stage
+				case 207: # [Marisa B] Next Stage
 					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
 					isPhantasmStageLinear = self.options['phantasm_stage'] == EXTRA_LINEAR
 					self.handler.addStage(isExtraStageLinear, isPhantasmStageLinear, MARISA, SHOT_B)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 209: # [Sakuya A] Next Stage
+				case 208: # [Sakuya A] Next Stage
 					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
 					isPhantasmStageLinear = self.options['phantasm_stage'] == EXTRA_LINEAR
 					self.handler.addStage(isExtraStageLinear, isPhantasmStageLinear, SAKUYA, SHOT_A)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 210: # [Sakuya B] Next Stage
+				case 209: # [Sakuya B] Next Stage
 					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
 					isPhantasmStageLinear = self.options['phantasm_stage'] == EXTRA_LINEAR
 					self.handler.addStage(isExtraStageLinear, isPhantasmStageLinear, SAKUYA, SHOT_B)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 200: # 25 Power Point
-					self.handler.add25Power()
-					gotAnyItem = True
-					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 211: # Extra Stage
+				case 210: # Extra Stage
 					isExtraStageApart = self.options['extra_stage'] == EXTRA_APART
 					if isExtraStageApart:
 						self.handler.unlockExtraStage()
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 212: # [Reimu] Extra Stage
+				case 211: # [Reimu] Extra Stage
 					isExtraStageApart = self.options['extra_stage'] == EXTRA_APART
 					if isExtraStageApart:
 						self.handler.unlockExtraStage(REIMU)
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 213: # [Marisa] Extra Stage
+				case 212: # [Marisa] Extra Stage
 					isExtraStageApart = self.options['extra_stage'] == EXTRA_APART
 					if isExtraStageApart:
 						self.handler.unlockExtraStage(MARISA)
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 214: # [Sakuya] Extra Stage
+				case 213: # [Sakuya] Extra Stage
 					isExtraStageApart = self.options['extra_stage'] == EXTRA_APART
 					if isExtraStageApart:
 						self.handler.unlockExtraStage(SAKUYA)
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 215: # [Reimu A] Extra Stage
+				case 214: # [Reimu A] Extra Stage
 					isExtraStageApart = self.options['extra_stage'] == EXTRA_APART
 					if isExtraStageApart:
 						self.handler.unlockExtraStage(REIMU, SHOT_A)
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 216: # [Reimu B] Extra Stage
+				case 215: # [Reimu B] Extra Stage
 					isExtraStageApart = self.options['extra_stage'] == EXTRA_APART
 					if isExtraStageApart:
 						self.handler.unlockExtraStage(REIMU, SHOT_B)
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 217: # [Marisa A] Extra Stage
+				case 216: # [Marisa A] Extra Stage
 					isExtraStageApart = self.options['extra_stage'] == EXTRA_APART
 					if isExtraStageApart:
 						self.handler.unlockExtraStage(MARISA, SHOT_A)
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 218: # [Marisa B] Extra Stage
+				case 217: # [Marisa B] Extra Stage
 					isExtraStageApart = self.options['extra_stage'] == EXTRA_APART
 					if isExtraStageApart:
 						self.handler.unlockExtraStage(MARISA, SHOT_B)
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 219: # [Sakuya A] Extra Stage
+				case 218: # [Sakuya A] Extra Stage
 					isExtraStageApart = self.options['extra_stage'] == EXTRA_APART
 					if isExtraStageApart:
 						self.handler.unlockExtraStage(SAKUYA, SHOT_A)
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 220: # [Sakuya B] Extra Stage
+				case 219: # [Sakuya B] Extra Stage
 					isExtraStageApart = self.options['extra_stage'] == EXTRA_APART
 					if isExtraStageApart:
 						self.handler.unlockExtraStage(SAKUYA, SHOT_B)
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 221: # Phantasm Stage
+				case 220: # Phantasm Stage
 					isPhantasmStageApart = self.options['phantasm_stage'] == EXTRA_APART
 					if isPhantasmStageApart:
 						self.handler.unlockPhantasmStage()
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 222: # [Reimu] Phantasm Stage
+				case 221: # [Reimu] Phantasm Stage
 					isPhantasmStageApart = self.options['phantasm_stage'] == EXTRA_APART
 					if isPhantasmStageApart:
 						self.handler.unlockPhantasmStage(REIMU)
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 223: # [Marisa] Phantasm Stage
+				case 222: # [Marisa] Phantasm Stage
 					isPhantasmStageApart = self.options['phantasm_stage'] == EXTRA_APART
 					if isPhantasmStageApart:
 						self.handler.unlockPhantasmStage(MARISA)
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 224: # [Sakuya] Phantasm Stage
+				case 223: # [Sakuya] Phantasm Stage
 					isPhantasmStageApart = self.options['phantasm_stage'] == EXTRA_APART
 					if isPhantasmStageApart:
 						self.handler.unlockPhantasmStage(SAKUYA)
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 225: # [Reimu A] Phantasm Stage
+				case 224: # [Reimu A] Phantasm Stage
 					isPhantasmStageApart = self.options['phantasm_stage'] == EXTRA_APART
 					if isPhantasmStageApart:
 						self.handler.unlockPhantasmStage(REIMU, SHOT_A)
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 226: # [Reimu B] Phantasm Stage
+				case 225: # [Reimu B] Phantasm Stage
 					isPhantasmStageApart = self.options['phantasm_stage'] == EXTRA_APART
 					if isPhantasmStageApart:
 						self.handler.unlockPhantasmStage(REIMU, SHOT_B)
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 227: # [Marisa A] Phantasm Stage
+				case 226: # [Marisa A] Phantasm Stage
 					isPhantasmStageApart = self.options['phantasm_stage'] == EXTRA_APART
 					if isPhantasmStageApart:
 						self.handler.unlockPhantasmStage(MARISA, SHOT_A)
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 228: # [Marisa B] Phantasm Stage
+				case 227: # [Marisa B] Phantasm Stage
 					isPhantasmStageApart = self.options['phantasm_stage'] == EXTRA_APART
 					if isPhantasmStageApart:
 						self.handler.unlockPhantasmStage(MARISA, SHOT_B)
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 229: # [Sakuya A] Phantasm Stage
+				case 228: # [Sakuya A] Phantasm Stage
 					isPhantasmStageApart = self.options['phantasm_stage'] == EXTRA_APART
 					if isPhantasmStageApart:
 						self.handler.unlockPhantasmStage(SAKUYA, SHOT_A)
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 230: # [Sakuya B] Phantasm Stage
+				case 229: # [Sakuya B] Phantasm Stage
 					isPhantasmStageApart = self.options['phantasm_stage'] == EXTRA_APART
 					if isPhantasmStageApart:
 						self.handler.unlockPhantasmStage(SAKUYA, SHOT_B)
@@ -414,6 +419,8 @@ class TouhouContext(CommonContext):
 					self.traps["freeze"] += 1
 				case 507: # Power Point Drain
 					self.traps["power_point_drain"] += 1
+				case 508: # No Cherry
+					self.traps["no_cherry"] += 1
 				case _:
 					print(f"Unknown Item: {item}")
 
@@ -579,6 +586,10 @@ class TouhouContext(CommonContext):
 						currentScore = 0
 						currentContinue = self.handler.getCurrentContinues()
 
+						# If we have the option to shorten the stage 4 and we are in it, we shorten it
+						if "shorter_stage_4" in self.options and self.options['shorter_stage_4'] and self.handler.getCurrentStage() == 4 and self.options['mode'] == PRACTICE_MODE:
+							self.handler.shortStage4()
+
 						# If the current situation is technically not possible, we lock checks
 						if(not self.handler.checkIfCurrentIsPossible((self.options['mode'] in NORMAL_MODE))):
 							noCheck = False
@@ -645,15 +656,20 @@ class TouhouContext(CommonContext):
 	async def menu_loop(self):
 		"""
 		Loop that handles the characters lock and difficulty lock, depending on the menu.
+		Also handle starting item from options
 		"""
 		try:
 			mode = self.options['mode']
 			phantasm = self.options['phantasm_stage']
 			exclude_lunatic = self.options['exclude_lunatic']
+			cherry_border = self.options['cherry_border']
 
 			if exclude_lunatic:
 				self.difficulties -= 1
 				self.handler.unlockDifficulty(self.difficulties)
+
+			if cherry_border == CHERRY_BORDER_NOT_RANDOMIZED:
+				self.handler.giveCherryBorder()
 
 			while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
 				await asyncio.sleep(0.1)
@@ -785,6 +801,11 @@ class TouhouContext(CommonContext):
 							self.msgQueue.append({"msg": SHORT_TRAP_NAME['power_point'], "color": BLUE_TEXT})
 							self.handler.playSound(0x1F)
 							self.handler.halfPowerPoint()
+						elif self.traps['no_cherry'] > 0:
+							self.traps['no_cherry'] -= 1
+							self.msgQueue.append({"msg": SHORT_TRAP_NAME['no_cherry'], "color": BLUE_TEXT})
+							self.handler.playSound(0x21)
+							self.handler.noCherry()
 
 						# Power Point Drain apply each loop until the player dies or the level is exited
 						if PowerPointDrain:

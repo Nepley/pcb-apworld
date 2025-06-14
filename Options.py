@@ -33,6 +33,18 @@ class ExcludeLunatic(Toggle):
 	"""If the Lunatic difficulty is excluded"""
 	display_name = "Exclude Lunatic difficulty"
 
+class CherryBorder(Choice):
+	"""
+	Determine if the ability to get the Cherry Border is randomized
+    Randomized: One item is added that unlock the Cherry Border
+    Progressive Randomized: The item is added in 6 exemplars, the first one unlock the Cherry Border, the other 5 decrease the value needed to activate it (By 5000 points each)
+	"""
+	display_name = "Cherry Border"
+	option_not_randomized = 0
+	option_randomized = 1
+	option_progressive_randomized = 2
+	default = 0
+
 class NumberLifeMid(Range):
 	"""Number of life the randomizer expect you to have before facing Alice and Prismriver sisters"""
 	display_name = "Number of life expected in order to face Alice and Prismriver sisters"
@@ -78,6 +90,10 @@ class DifficultyEnd(Choice):
 	option_normal = 2
 	option_easy = 3
 	default = 0
+
+class ShorterStage4(Toggle):
+	"""QoL: Shorten the stage 4 by making it start at the midboss. Only work in Practice Mode"""
+	display_name = "Shorter Stage 4"
 
 class ExtraStage(Choice):
 	"""
@@ -261,16 +277,28 @@ class PowerPointDrainTrap(Range):
 	range_end = 100
 	default = 15
 
+class NoCherryTrap(Range):
+	"""
+	Weight of the no cherry trap.
+    This trap set your current cherry and cherry+ to 0
+	"""
+	display_name = "No Cherry Trap"
+	range_start = 0
+	range_end = 100
+	default = 20
+
 game_options: Dict[str, type(Option)] = {
 	"mode": Mode,
 	"stage_unlock": StageUnlock,
 	"exclude_lunatic": ExcludeLunatic,
+	"cherry_border": CherryBorder,
 	"number_life_mid": NumberLifeMid,
 	"number_bomb_mid": NumberBombsMid,
 	"difficulty_mid": DifficultyMid,
 	"number_life_end": NumberLifeEnd,
 	"number_bomb_end": NumberBombsEnd,
 	"difficulty_end": DifficultyEnd,
+	"shorter_stage_4": ShorterStage4,
 	"extra_stage": ExtraStage,
 	"number_life_extra": NumberLifeExtra,
 	"number_bomb_extra": NumberBombsExtra,
@@ -292,4 +320,5 @@ game_options: Dict[str, type(Option)] = {
 	"aya_speed_trap": AyaSpeedTrap,
 	"freeze_trap": FreezeTrap,
 	"power_point_drain_trap": PowerPointDrainTrap,
+	"no_cherry_trap": NoCherryTrap,
 }
