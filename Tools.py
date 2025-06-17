@@ -73,7 +73,7 @@ def textToBytes(text: str, red = False):
 
 def getLocationMapping(shot_type, difficulty):
 	mapping = {}
-	final_stage_id = []
+	stage_specific_location_id = {"stage_6": [], "extra": []}
 
 	for location, id in location_table.items():
 		character_id = 0
@@ -141,9 +141,11 @@ def getLocationMapping(shot_type, difficulty):
 			level = 6 if level_id == "Extra" else 7 if level_id == "Phantasm" else int(level_id)-1
 			counter = len(STAGES_LIST[level])-1
 
-			# If it's the final stage clear, we add it to the list
+			# If it's the final stage clear or the extra stage, we add it to the list
 			if level == 5:
-				final_stage_id.append(id)
+				stage_specific_location_id["stage_6"].append(id)
+			elif level == 6:
+				stage_specific_location_id["extra"].append(id)
 		else:
 			tmp_level = -1
 			for stage in STAGES_LIST:
@@ -177,7 +179,7 @@ def getLocationMapping(shot_type, difficulty):
 
 		mapping[id] = [character_id, level, counter, shot_type_id, difficulty_id]
 
-	return mapping, final_stage_id
+	return mapping, stage_specific_location_id
 
 def getPointerAddress(pm, base, offsets):
 	address = base

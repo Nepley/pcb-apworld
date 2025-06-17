@@ -39,7 +39,7 @@ class TouhouContext(CommonContext):
 		self.item_ap_id_to_name = None
 		self.previous_location_checked = None
 		self.location_mapping = None
-		self.final_stage_location_ids = None
+		self.stage_specific_location_id = None
 
 		self.is_connected = False
 		self.last_death_link = 0
@@ -76,7 +76,7 @@ class TouhouContext(CommonContext):
 			self.options = args["slot_data"] # Yaml Options
 			self.is_connected = True
 			self.otherDifficulties = self.options['difficulty_check'] == DIFFICULTY_WITH_LOWER
-			self.location_mapping, self.final_stage_location_ids = getLocationMapping(self.options['shot_type'], self.options['difficulty_check'] in DIFFICULTY_CHECK)
+			self.location_mapping, self.stage_specific_location_id = getLocationMapping(self.options['shot_type'], self.options['difficulty_check'] in DIFFICULTY_CHECK)
 
 			if self.handler is not None:
 				self.handler.reset()
@@ -441,9 +441,17 @@ class TouhouContext(CommonContext):
 			if self.handler.isBossBeaten(*map) and id not in self.previous_location_checked:
 				# We add it to the list of checked locations
 				new_locations.append(id)
-				# If we are in normal mode, the extra stage is set to linear and the stage 6 has just been cleared. We unlock it if it's not already.
-				if not self.handler.canExtra() and self.options['mode'] in NORMAL_MODE and self.options['extra_stage'] == EXTRA_LINEAR and id in self.final_stage_location_ids:
-					self.handler.unlockExtraStage()
+
+				if self.options['mode'] in NORMAL_MODE:
+					# If we are in normal mode, the extra stage is set to linear and the stage 6 has just been cleared. We unlock it if it's not already.
+					if self.options['extra_stage'] == EXTRA_LINEAR:
+						if not self.handler.canExtra() and id in self.stage_specific_location_id["stage_6"]:
+							self.handler.unlockExtraStage()
+
+					# If we are in normal mode, the phantasm stage is set to linear and the stage 6 or extra (depending on the extra option) has just been cleared. We unlock it if it's not already.
+					if self.options['phantasm_stage'] == EXTRA_LINEAR:
+						if not self.handler.canPhantasm() and ((self.options['extra_stage'] == EXTRA_LINEAR and id in self.stage_specific_location_id["extra"]) or (self.options['extra_stage'] != EXTRA_LINEAR and id in self.stage_specific_location_id["stage_6"])):
+							self.handler.unlockPhantasmStage()
 
 		# If we have new locations, we send them to the server and add them to the list of checked locations
 		if new_locations:
