@@ -5,7 +5,7 @@ from worlds.AutoWorld import World
 from worlds.LauncherComponents import Component, components, launch_subprocess, Type
 from .Items import TItem, get_items_by_category, item_table
 from .Locations import location_table
-from .Options import game_options
+from .Options import Th07Options
 from .Regions import create_regions
 from .Rules import set_rules
 
@@ -23,13 +23,14 @@ components.append(Component(
 
 class TWorld(World):
 	game = DISPLAY_NAME
-	option_definitions = game_options
+	options: Th07Options
+	options_dataclass = Th07Options
 
 	item_name_to_id = {name: data.code for name, data in item_table.items()}
 	location_name_to_id = {name: id for name, id in location_table.items()}
 
 	def fill_slot_data(self) -> dict:
-		return {option_name: getattr(self.options, option_name).value for option_name in game_options}
+		return {option_name: getattr(self.options, option_name).value for option_name in self.options_dataclass.__dataclass_fields__.keys()}
 
 	def create_items(self):
 		item_pool: List[TItem] = []
@@ -227,7 +228,7 @@ class TWorld(World):
 				number_placed_item += 3
 
 		# If the final boss is a potential goal
-		if not extra or goal not in [ENDING_EXTRA, ENDING_PHANTASM]:
+		if (not extra and goal == ENDING_EXTRA) or (not phantasm and goal == ENDING_PHANTASM) or goal in [ENDING_NORMAL, ENDING_ALL]:
 			if shot_type:
 				self.multiworld.get_location("[Reimu A] Stage 6 Clear", self.player).place_locked_item(ending_normal_reimu)
 				self.multiworld.get_location("[Reimu B] Stage 6 Clear", self.player).place_locked_item(ending_normal_reimu)

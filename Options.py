@@ -1,6 +1,5 @@
-from typing import Dict
-
-from Options import Choice, Range, Option, Toggle, DeathLink
+from dataclasses import dataclass
+from Options import Choice, Range, Option, Toggle, DeathLink, PerGameCommonOptions
 
 class Mode(Choice):
 	"""
@@ -287,38 +286,38 @@ class NoCherryTrap(Range):
 	range_end = 100
 	default = 20
 
-game_options: Dict[str, type(Option)] = {
-	"mode": Mode,
-	"stage_unlock": StageUnlock,
-	"exclude_lunatic": ExcludeLunatic,
-	"cherry_border": CherryBorder,
-	"number_life_mid": NumberLifeMid,
-	"number_bomb_mid": NumberBombsMid,
-	"difficulty_mid": DifficultyMid,
-	"number_life_end": NumberLifeEnd,
-	"number_bomb_end": NumberBombsEnd,
-	"difficulty_end": DifficultyEnd,
-	"shorter_stage_4": ShorterStage4,
-	"extra_stage": ExtraStage,
-	"number_life_extra": NumberLifeExtra,
-	"number_bomb_extra": NumberBombsExtra,
-	"phantasm_stage": PhantasmStage,
-	"number_life_phantasm": NumberLifePhantasm,
-	"number_bomb_phantasm": NumberBombsPhantasm,
-	"shot_type": ShotTypeCheck,
-	"difficulty_check": DifficultyCheck,
-	"goal": Goal,
-	"ending_required": EndingRequired,
-	"death_link": DeathLink,
-	"ring_link": RingLink,
-	"traps": Traps,
-	"power_point_trap": PowerPointTrap,
-	"bomb_trap": BombTrap,
-	"life_trap": LifeTrap,
-	"no_focus_trap": NoFocusTrap,
-	"reverse_movement_trap": ReverseMovementTrap,
-	"aya_speed_trap": AyaSpeedTrap,
-	"freeze_trap": FreezeTrap,
-	"power_point_drain_trap": PowerPointDrainTrap,
-	"no_cherry_trap": NoCherryTrap,
-}
+@dataclass
+class Th07Options(PerGameCommonOptions):
+	mode: Mode
+	stage_unlock: StageUnlock
+	exclude_lunatic: ExcludeLunatic
+	cherry_border: CherryBorder
+	number_life_mid: NumberLifeMid
+	number_bomb_mid: NumberBombsMid
+	difficulty_mid: DifficultyMid
+	number_life_end: NumberLifeEnd
+	number_bomb_end: NumberBombsEnd
+	difficulty_end: DifficultyEnd
+	shorter_stage_4: ShorterStage4
+	extra_stage: ExtraStage
+	number_life_extra: NumberLifeExtra
+	number_bomb_extra: NumberBombsExtra
+	phantasm_stage: PhantasmStage
+	number_life_phantasm: NumberLifePhantasm
+	number_bomb_phantasm: NumberBombsPhantasm
+	shot_type: ShotTypeCheck
+	difficulty_check: DifficultyCheck
+	goal: Goal
+	ending_required: EndingRequired
+	death_link: DeathLink
+	ring_link: RingLink
+	traps: Traps
+	power_point_trap: PowerPointTrap
+	bomb_trap: BombTrap
+	life_trap: LifeTrap
+	no_focus_trap: NoFocusTrap
+	reverse_movement_trap: ReverseMovementTrap
+	aya_speed_trap: AyaSpeedTrap
+	freeze_trap: FreezeTrap
+	power_point_drain_trap: PowerPointDrainTrap
+	no_cherry_trap: NoCherryTrap
