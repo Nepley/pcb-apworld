@@ -2,7 +2,6 @@ import pymem
 import pymem.exception
 from .Tools import getPointerAddress
 from .Variables import *
-import time
 
 class gameController:
 	"""Class accessing the game memory"""
@@ -986,16 +985,16 @@ class gameController:
 	def initSoundHack(self):
 		soundIdHex = hex(self.addrCustomSoundId)[2:]
 		soundId = [int(soundIdHex[i:i+2], 16) for i in range(0, len(soundIdHex), 2)]
-		self.pm.write_bytes(self.addrSoundHack2, bytes([0xE9, 0xA1, 0xC2, 0x01, 0x00,
+		self.pm.write_bytes(self.addrSoundHack2, bytes([0xE9, 0x1A, 0x3D, 0x22, 0x00,
 														0x5D,
 														0xC2, 0x08, 0x00]), 9)
 
 		self.pm.write_bytes(self.addrSoundHack1, bytes([0x6A, 0x00,
 														0xFF, 0x35, soundId[2], soundId[1], soundId[0], 0x00,
 														0xB9, 0xD8, 0xA0, 0x4B, 0x00,
-														0xE8, 0x27, 0xE6, 0x02, 0x00,
+														0xE8, 0xAE, 0x6B, 0xE2, 0xFF,
 														0xC7, 0x05, soundId[2], soundId[1], soundId[0], 0x00, 0x30, 0x00, 0x00, 0x00,
-														0xE9, 0x3E, 0x3D, 0xFE, 0xFF]), 33)
+														0xE9, 0xC5, 0xC2, 0xDD, 0xFF]), 33)
 
 	def setCustomSoundId(self, soundId = 0x0D):
 		self.pm.write_bytes(self.addrCustomSoundId, bytes([soundId]), 1)

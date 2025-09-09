@@ -432,7 +432,7 @@ class TouhouContext(CommonContext):
 
 	async def update_locations_checked(self):
 		"""
-		Check if any locations has been checked since last called, if a location has ben checked, we send a message and update our list of checked location
+		Check if any locations has been checked since last called, if a location has been checked, we send a message and update our list of checked location
 		"""
 		new_locations = []
 
