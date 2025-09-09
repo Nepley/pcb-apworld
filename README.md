@@ -1,6 +1,6 @@
 # Touhou 7 ~ Perfect Cherry Blossom Apworld
 
-This is an implementation of touhou 6 for [Archipelago](https://github.com/ArchipelagoMW/Archipelago)<br />
+This is an implementation of touhou 7 for [Archipelago](https://github.com/ArchipelagoMW/Archipelago)<br />
 
 ## How does this randomizer work ?
 At the start, you start with only one character and one shot type, with zero resources and with only the Lunatic difficulty.<br />
