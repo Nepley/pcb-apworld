@@ -679,6 +679,15 @@ class TouhouContext(CommonContext):
 			if cherry_border == CHERRY_BORDER_NOT_RANDOMIZED:
 				self.handler.giveCherryBorder()
 
+			# If we have previous location checked, we check if, in normal mode, an ending has been reach in order to unlock Extra/Phantasm if needed
+			if self.previous_location_checked is not None and self.options['mode'] in NORMAL_MODE and (self.options['extra_stage'] == EXTRA_LINEAR or self.options['phantasm_stage'] == EXTRA_LINEAR):
+				for id in self.previous_location_checked:
+					if self.options['extra_stage'] == EXTRA_LINEAR and id in self.stage_specific_location_id["stage_6"]:
+						self.handler.unlockExtraStage()
+
+					if self.options['phantasm_stage'] == EXTRA_LINEAR and ((self.options['extra_stage'] == EXTRA_LINEAR and id in self.stage_specific_location_id["extra"]) or (self.options['extra_stage'] != EXTRA_LINEAR and id in self.stage_specific_location_id["stage_6"])):
+						self.handler.unlockPhantasmStage()
+
 			while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
 				await asyncio.sleep(0.1)
 				game_mode = self.handler.getGameMode()
