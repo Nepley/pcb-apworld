@@ -3,17 +3,199 @@ import asyncio
 import colorama
 import time
 import random
+import traceback
 from .gameHandler import *
+from .guardRail import *
 from .Tools import *
 from .Mapping import *
 
 from CommonClient import (
 	CommonContext,
+	ClientCommandProcessor,
 	get_base_parser,
 	logger,
 	server_loop,
 	gui_enabled,
 )
+
+class TouhouClientProcessor(ClientCommandProcessor):
+	def _cmd_multiple_difficulty_check(self, active = None):
+		"""Toggle the possibility to check multiple difficulty check by doing the highest difficulty
+        :param active: If "on" or "true", enable it. If "off" or "false", disable it."""
+		changed = False
+		if self.ctx.handler is not None and self.ctx.handler.gameController is not None:
+			if active is not None:
+				if active.lower() in ["on", "true"]:
+					self.ctx.check_multiple_difficulty = True
+					changed = True
+					logger.info("Multiple difficulty check enabled")
+				elif active.lower() in ("off", "false"):
+					self.ctx.check_multiple_difficulty = False
+					changed = True
+					logger.info("Multiple difficulty check disabled")
+				else:
+					logger.error("Invalid argument, use 'on' or 'off'")
+			else:
+				logger.info(f"Multiple difficulty check is {'enabled' if self.ctx.check_multiple_difficulty else 'disabled'}")
+		else:
+			logger.error("Multiple difficulty check cannot be changed before connecting to the game and server")
+
+		return changed
+
+	def _cmd_deathlink(self, active = None):
+		"""Toggle DeathLink on or off
+        :param active: If "on" or "true", enable DeathLink. If "off" or "false", disable DeathLink."""
+		changed = False
+		if self.ctx.handler is not None and self.ctx.handler.gameController is not None:
+			if active is not None:
+				if active.lower() in ["on", "true"]:
+					if "DeathLink" not in self.ctx.tags:
+						self.ctx.tags.add("DeathLink")
+						self.ctx.death_link_is_active = True
+						changed = True
+					logger.info("DeathLink enabled")
+				elif active.lower() in ("off", "false"):
+					if "DeathLink" in self.ctx.tags:
+						self.ctx.tags.remove("DeathLink")
+						self.ctx.death_link_is_active = False
+						changed = True
+					logger.info("DeathLink disabled")
+				else:
+					logger.error("Invalid argument, use 'on' or 'off'")
+
+				if changed:
+					asyncio.create_task(self.ctx.send_msgs([{"cmd": "ConnectUpdate", "tags": self.ctx.tags}]))
+			else:
+				logger.info(f"DeathLink is {'enabled' if self.ctx.death_link_is_active else 'disabled'}")
+		else:
+			logger.error("DeathLink cannot be changed before connecting to the game and server")
+
+		return changed
+
+	def _cmd_deathlink_trigger(self, value = None):
+		"""Get or Set the trigger for the DeayhLink trigger
+        :param value: Possibler values are "life" or "gameover"
+		"""
+		if self.ctx.handler is not None and self.ctx.handler.gameController is not None:
+			if value is not None:
+				if value.lower() == "life":
+					self.ctx.death_link_trigger = DEATH_LINK_LIFE
+					logger.info("DeathLink trigger set to 'Life'")
+					return True
+				elif value.lower() == "gameover":
+					self.ctx.death_link_trigger = DEATH_LINK_GAME_OVER
+					logger.info("DeathLink trigger set to 'Game Over'")
+					return True
+				else:
+					logger.error("Invalid argument, use 'life' or 'gameover'")
+					return False
+			else:
+				trigger = "Life" if self.ctx.death_link_trigger == DEATH_LINK_LIFE else "Game Over"
+				logger.info(f"Current DeathLink Trigger: {trigger}")
+				return True
+		else:
+			logger.error("DeathLink amnesty cannot be accessed before connecting to the game and server")
+			return False
+
+	def _cmd_deathlink_amnesty(self, value = -1):
+		"""Get or Set the number of death before sending a DeathLink
+        :param value: Set the amnesty to this value, must be between 0 and 10."""
+		if self.ctx.handler is not None and self.ctx.handler.gameController is not None:
+			if value == -1:
+				logger.info(f"Current DeathLink amnesty: {self.ctx.death_link_amnesty}")
+				return True
+			else:
+				try:
+					value = int(value)
+					if value < 0 or value > 10:
+						raise ValueError
+					self.ctx.death_link_amnesty = value
+					logger.info(f"New DeathLink amnesty: {value}")
+					return True
+				except ValueError:
+					logger.error("Invalid argument, amnesty must be between 0 and 10")
+					return False
+		else:
+			logger.error("DeathLink amnesty cannot be accessed before connecting to the game and server")
+			return False
+
+	def _cmd_ringlink(self, active = None):
+		"""Toggle RingLink on or off
+        :param active: If "on" or "true", enable RingLink. If "off" or "false", disable RingLink."""
+		changed = False
+		if self.ctx.handler is not None and self.ctx.handler.gameController is not None:
+			if active is not None:
+				if active.lower() in ("on", "true"):
+					if "RingLink" not in self.ctx.tags:
+						self.ctx.tags.add("RingLink")
+						self.ctx.ring_link_is_active = True
+						changed = True
+					logger.info("RingLink enabled")
+				elif active.lower() in ("off", "false"):
+					if "RingLink" in self.ctx.tags:
+						self.ctx.tags.remove("RingLink")
+						changed = True
+						self.ctx.ring_link_is_active = False
+					logger.info("RingLink disabled")
+				else:
+					logger.error("Invalid argument, use 'on' or 'off'")
+
+				if changed:
+					asyncio.create_task(self.ctx.send_msgs([{"cmd": "ConnectUpdate", "tags": self.ctx.tags}]))
+			else:
+				logger.info(f"RingLink is {'enabled' if self.ctx.ring_link_is_active else 'disabled'}")
+		else:
+			logger.error("RingLink cannot be changed before connecting to the game and server")
+
+		return changed
+
+	def _cmd_limits(self, lives = -1, bombs = -1):
+		"""Get or Set the max limits for lives and bombs
+        :param lives: New max lives value, must be between 0 and 8.
+        :param bombs: New max bombs value, must be between 0 and 8."""
+		if self.ctx.handler is not None and self.ctx.handler.gameController is not None:
+			if lives == -1 and bombs == -1:
+				logger.info(f"Current max lives: {self.ctx.handler.limitLives} / Current max bombs: {self.ctx.handler.limitBombs}")
+				return True
+			else:
+				try:
+					lives = int(lives)
+					bombs = int(bombs)
+					if lives < 0 or lives > 8 or bombs < 0 or bombs > 8:
+						raise ValueError
+					self.ctx.handler.setLivesLimit(lives)
+					self.ctx.handler.setBombsLimit(bombs)
+					logger.info(f"New max lives: {lives} / New max bombs: {bombs}")
+					return True
+				except ValueError:
+					logger.error("Invalid argument, limits must be between 0 and 8")
+					return False
+		else:
+			logger.error("Limits cannot be accessed before connecting to the game and server")
+			return False
+
+	def _cmd_shorter_stage_4(self, active = None):
+		"""Toggle if the stage 4 is made shorter by making it start at the midboss. Only work in Practice Mode.
+        :param active: If "on" or "true", enable it. If "off" or "false", disable it."""
+		changed = False
+		if self.ctx.handler is not None and self.ctx.handler.gameController is not None:
+			if active is not None:
+				if active.lower() in ["on", "true"]:
+					self.ctx.shorter_stage_4 = True
+					changed = True
+					logger.info("Shorter stage 4 enabled")
+				elif active.lower() in ("off", "false"):
+					self.ctx.shorter_stage_4 = False
+					changed = True
+					logger.info("Shorter stage 4 disabled")
+				else:
+					logger.error("Invalid argument, use 'on' or 'off'")
+			else:
+				logger.info(f"Shorter stage 4 is {'enabled' if self.ctx.shorter_stage_4 else 'disabled'}")
+		else:
+			logger.error("Shorter stage 4 cannot be changed before connecting to the game and server")
+
+		return changed
 
 class TouhouContext(CommonContext):
 	"""Touhou Game Context"""
@@ -21,13 +203,16 @@ class TouhouContext(CommonContext):
 		super().__init__(server_address, password)
 		self.game = DISPLAY_NAME
 		self.items_handling = 0b111  # Item from starting inventory, own world and other world
-		self.pending_death_link = False
+		self.command_processor = TouhouClientProcessor
+		self.reset()
 
+	def reset(self):
 		self.current_power_point = -1
 		self.ring_link_id = None
 		self.last_power_point = -1
 
 		self.handler = None # gameHandler
+		self.pending_death_link = False
 		self.inError = False
 		self.msgQueue = []
 
@@ -44,6 +229,11 @@ class TouhouContext(CommonContext):
 		self.is_connected = False
 		self.last_death_link = 0
 		self.last_ring_link = 0
+		self.death_link_is_active = False
+		self.ring_link_is_active = False
+		self.death_link_amnesty = 0
+		self.death_link_trigger = DEATH_LINK_LIFE
+		self.shorter_stage_4 = False
 
 		# Counter
 		self.difficulties = 3
@@ -51,7 +241,7 @@ class TouhouContext(CommonContext):
 		self.can_trap = True
 
 		self.options = None
-		self.otherDifficulties = False
+		self.check_multiple_difficulty = False
 		self.ExtraMenu = False
 		self.minimalCursor = 0
 
@@ -75,7 +265,7 @@ class TouhouContext(CommonContext):
 			self.all_location_ids = set(args["missing_locations"] + args["checked_locations"])
 			self.options = args["slot_data"] # Yaml Options
 			self.is_connected = True
-			self.otherDifficulties = self.options['difficulty_check'] == DIFFICULTY_WITH_LOWER
+			self.check_multiple_difficulty = self.options['check_multiple_difficulty']
 			self.location_mapping, self.stage_specific_location_id = getLocationMapping(self.options['shot_type'], self.options['difficulty_check'] in DIFFICULTY_CHECK)
 
 			if self.handler is not None:
@@ -128,7 +318,7 @@ class TouhouContext(CommonContext):
 			return
 
 		logger.info("Waiting for connect from server...")
-		while not self.client_recieved_initial_server_data():
+		while not self.client_recieved_initial_server_data() and not self.exit_event.is_set():
 			await asyncio.sleep(1)
 
 	async def give_item(self, items):
@@ -410,19 +600,19 @@ class TouhouContext(CommonContext):
 				case 502: # -1 Life
 					self.traps["life"] += 1
 				case 503: # No Focus
-					self.traps["no_focus"] += 1
+					self.traps["no_focus"] = 1
 				case 504: # Reverse Movement
-					self.traps["reverse_control"] += 1
+					self.traps["reverse_control"] = 1
 				case 505: # Aya Speed
-					self.traps["aya_speed"] += 1
+					self.traps["aya_speed"] = 1
 				case 506: # Freeze
 					self.traps["freeze"] += 1
 				case 507: # Power Point Drain
-					self.traps["power_point_drain"] += 1
+					self.traps["power_point_drain"] = 1
 				case 508: # No Cherry
 					self.traps["no_cherry"] += 1
 				case _:
-					print(f"Unknown Item: {item}")
+					logger.error(f"Unknown Item: {item}")
 
 		if gotAnyItem:
 			self.handler.playSound(0x19)
@@ -505,8 +695,13 @@ class TouhouContext(CommonContext):
 		self.handler.updateStageList(mode == PRACTICE_MODE)
 		self.handler.updatePracticeScore(self.location_mapping, self.previous_location_checked)
 
-	def addRingLinkTag(self):
-		self.tags.add("RingLink")
+	def setRingLinkTag(self, active):
+		if active:
+			self.tags.add("RingLink")
+			self.ring_link_is_active = True
+		else:
+			self.tags.remove("RingLink")
+			self.ring_link_is_active = False
 		asyncio.create_task(self.send_msgs([{"cmd": "ConnectUpdate", "tags": self.tags}]))
 
 	def checkVictory(self):
@@ -577,7 +772,7 @@ class TouhouContext(CommonContext):
 			noCheck = True #We start by disabling the checks since we don't know where the player would be when connecting the client
 			currentScore = 0
 			currentContinue = 0
-			while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
+			while not self.exit_event.is_set() and self.handler and not self.inError:
 				await asyncio.sleep(0.5)
 				gameMode = self.handler.getGameMode()
 				# If we failed to get the game mode, we skip the loop
@@ -595,7 +790,7 @@ class TouhouContext(CommonContext):
 						currentContinue = self.handler.getCurrentContinues()
 
 						# If we have the option to shorten the stage 4 and we are in it, we shorten it
-						if "shorter_stage_4" in self.options and self.options['shorter_stage_4'] and self.handler.getCurrentStage() == 4 and self.options['mode'] == PRACTICE_MODE:
+						if self.shorter_stage_4 and self.handler.getCurrentStage() == 4 and self.options['mode'] == PRACTICE_MODE:
 							self.handler.shortStage4()
 
 						# If the current situation is technically not possible, we lock checks
@@ -633,7 +828,7 @@ class TouhouContext(CommonContext):
 									if bossCounter == nbBoss-1:
 										self.can_trap = False
 										bossCounter = -1
-									self.handler.setCurrentStageBossBeaten(bossCounter, self.otherDifficulties)
+									self.handler.setCurrentStageBossBeaten(bossCounter, self.check_multiple_difficulty)
 									await self.update_locations_checked()
 								bossPresent = False
 
@@ -658,7 +853,8 @@ class TouhouContext(CommonContext):
 						noCheck = False # We enable the checks once we're in the menu
 					self.updateStageList()
 		except Exception as e:
-			print(f"ERROR: {e}")
+			logger.error(f"Main ERROR: {e}")
+			logger.error(traceback.format_exc())
 			self.inError = True
 
 	async def menu_loop(self):
@@ -688,7 +884,7 @@ class TouhouContext(CommonContext):
 					if self.options['phantasm_stage'] == EXTRA_LINEAR and ((self.options['extra_stage'] == EXTRA_LINEAR and id in self.stage_specific_location_id["extra"]) or (self.options['extra_stage'] != EXTRA_LINEAR and id in self.stage_specific_location_id["stage_6"])):
 						self.handler.unlockPhantasmStage()
 
-			while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
+			while not self.exit_event.is_set() and self.handler and not self.inError:
 				await asyncio.sleep(0.1)
 				game_mode = self.handler.getGameMode()
 				# If we failed to get the game mode, we skip the loop
@@ -725,7 +921,8 @@ class TouhouContext(CommonContext):
 					except Exception as e:
 						pass
 		except Exception as e:
-			print(f"ERROR: {e}")
+			logger.error(f"Menu ERROR: {e}")
+			logger.error(traceback.format_exc())
 			self.inError = True
 
 	async def trap_loop(self):
@@ -747,7 +944,7 @@ class TouhouContext(CommonContext):
 			currentScore = 0
 			currentContinue = 0
 			restarted = False
-			while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
+			while not self.exit_event.is_set() and self.handler and not self.inError:
 				await asyncio.sleep(1)
 				game_mode = self.handler.getGameMode()
 				# If we failed to get the game mode, we skip the loop
@@ -852,7 +1049,8 @@ class TouhouContext(CommonContext):
 					restarted = False
 					currentScore = 0
 		except Exception as e:
-			print(f"ERROR: {e}")
+			logger.error(f"Trap ERROR: {e}")
+			logger.error(traceback.format_exc())
 			self.inError = True
 
 	async def death_link_loop(self):
@@ -866,9 +1064,15 @@ class TouhouContext(CommonContext):
 			currentMisses = 0
 			currentLives = 0
 			hasDied = False
+			nb_death = 0
 
-			while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
-				await asyncio.sleep(0.5)
+			while not self.exit_event.is_set() and self.handler and not self.inError:
+				if(self.death_link_is_active):
+					await asyncio.sleep(0.5)
+				else:
+					await asyncio.sleep(2)
+					inLevel = False
+					continue
 				game_mode = self.handler.getGameMode()
 				# If we failed to retrieve the game mode, we skip the loop
 				if game_mode == -2:
@@ -910,7 +1114,13 @@ class TouhouContext(CommonContext):
 					if self.handler.getCurrentLives() != currentLives:
 						# If it's lower and there is no death link on going, then a death has occured and we send a death link
 						if self.handler.getCurrentLives() < currentLives and hasDied:
-							await self.send_death_link()
+							if self.death_link_trigger == DEATH_LINK_LIFE or (self.death_link_trigger == DEATH_LINK_GAME_OVER and self.handler.getCurrentLives() == 0):
+								nb_death += 1
+								if nb_death >= self.death_link_amnesty:
+									await self.send_death_link()
+									nb_death = 0
+								else:
+									logger.info(f"DeathLink: {nb_death}/{self.death_link_amnesty}")
 
 						currentLives = self.handler.getCurrentLives()
 					elif hasDied: # If the player has deathbomb
@@ -920,12 +1130,19 @@ class TouhouContext(CommonContext):
 						if deathCounter <= 0:
 							hasDied = False
 				else:
-					inLevel = False
-					if hasDied:
-						await self.send_death_link()
+					# If we exit the level, as a failsafe, we recheck if it was a death (in the case where the player got back into the menu before the loop detected the death in game)
+					if hasDied or (inLevel and currentMisses < self.handler.getMisses()):
+						nb_death += 1
+						if nb_death >= self.death_link_amnesty:
+							await self.send_death_link()
+							nb_death = 0
+						else:
+							logger.info(f"DeathLink: {nb_death}/{self.death_link_amnesty}")
 						hasDied = False
+					inLevel = False
 		except Exception as e:
-			print(f"ERROR: {e}")
+			logger.error(f"DeathLink ERROR: {e}")
+			logger.error(traceback.format_exc())
 			self.inError = True
 
 	async def message_loop(self):
@@ -933,7 +1150,7 @@ class TouhouContext(CommonContext):
 		Loop that handles displaying message
 		"""
 		try:
-			while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
+			while not self.exit_event.is_set() and self.handler and not self.inError:
 				if self.msgQueue != []:
 					msg = self.msgQueue[0]
 					self.msgQueue.pop(0)
@@ -942,7 +1159,8 @@ class TouhouContext(CommonContext):
 				else:
 					await asyncio.sleep(0.1)
 		except Exception as e:
-			print(f"ERROR: {e}")
+			logger.error(f"Message ERROR: {e}")
+			logger.error(traceback.format_exc())
 			self.inError = True
 
 	async def ring_link_loop(self):
@@ -954,8 +1172,13 @@ class TouhouContext(CommonContext):
 			self.ring_link_id = random.randint(0, 999999)
 			self.timer = 0.5
 
-			while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
-				await asyncio.sleep(self.timer)
+			while not self.exit_event.is_set() and self.handler and not self.inError:
+				if(self.ring_link_is_active):
+					await asyncio.sleep(self.timer)
+				else:
+					await asyncio.sleep(2)
+					self.last_power_point = -1
+					continue
 				game_mode = self.handler.getGameMode()
 				# If we failed to retrieve the game mode, we skip the loop
 				if game_mode == -2:
@@ -981,8 +1204,41 @@ class TouhouContext(CommonContext):
 					self.last_power_point = -1
 					self.timer = 0.5
 		except Exception as e:
-			print(f"ERROR: {e}")
+			logger.error(f"RingLink ERROR: {e}")
+			logger.error(traceback.format_exc())
 			self.inError = True
+
+	async def guard_rail_loop(self):
+		"""
+		Loop that handles the guard rail
+		"""
+		in_menu = False
+		guard_rail = GuardRail(self.handler.gameController, self.handler, self.options)
+		while not self.exit_event.is_set() and self.handler and not self.inError:
+			try:
+				await asyncio.sleep(5)
+				result = guard_rail.check_memory_addresses()
+				if result["error"]:
+					logger.error(f"Memory ERROR: {result['message']}")
+
+				if self.handler.getGameMode() != IN_GAME:
+					if not in_menu:
+						await asyncio.sleep(2)  # Give some time for the menu to fully load
+						in_menu = True
+
+					result = guard_rail.check_cursor_state()
+					if result["error"]:
+						logger.error(f"Cursor State ERROR: {result['message']}")
+
+					result = guard_rail.check_menu_lock()
+					if result["error"]:
+						logger.error(f"Menu Lock ERROR: {result['message']}")
+				else:
+					in_menu = False
+			except Exception as e:
+				logger.error(f"GuardRail ERROR: {e}")
+				logger.error(traceback.format_exc())
+				self.inError = True
 
 	async def connect_to_game(self):
 		"""
@@ -991,22 +1247,21 @@ class TouhouContext(CommonContext):
 		self.handler = None
 
 		while not self.handler:
-			pid = await find_process()
-			if pid:
-				self.handler = gameHandler(pid)
-			await asyncio.sleep(2)
+			try:
+				self.handler = gameHandler()
+			except Exception as e:
+				await asyncio.sleep(2)
 
 	async def reconnect_to_game(self):
 		"""
 		Reconnect to client to the game process without resetting everything
 		"""
-		self.handler.gameController = None
 
 		while not self.handler.gameController:
-			pid = await find_process()
-			if pid:
-				self.handler.reconnect(pid)
-			await asyncio.sleep(2)
+			try:
+				self.handler.reconnect()
+			except Exception as e:
+				await asyncio.sleep(2)
 
 async def game_watcher(ctx: TouhouContext):
 	"""
@@ -1020,8 +1275,10 @@ async def game_watcher(ctx: TouhouContext):
 	await ctx.wait_for_initial_connection_info()
 
 	while not ctx.exit_event.is_set():
+		# client disconnected from server
 		if not ctx.server:
-			# client disconnected from server
+			# We reset the context
+			ctx.reset()
 			await ctx.wait_for_initial_connection_info()
 
 		# First connection
@@ -1034,6 +1291,7 @@ async def game_watcher(ctx: TouhouContext):
 		# Connection following an error
 		if ctx.inError:
 			logger.info(f"Connection lost. Waiting for connection to {SHORT_NAME}...")
+			ctx.handler.gameController = None
 			asyncio.create_task(ctx.reconnect_to_game())
 			await asyncio.sleep(1)
 			while(ctx.handler.gameController is None and not ctx.exit_event.is_set()):
@@ -1044,27 +1302,47 @@ async def game_watcher(ctx: TouhouContext):
 			logger.info(f"{SHORT_NAME} process found. Starting loop...")
 
 			# We start all the diffrent loops
-			asyncio.create_task(ctx.main_loop())
-			asyncio.create_task(ctx.menu_loop())
-			asyncio.create_task(ctx.trap_loop())
-			asyncio.create_task(ctx.message_loop())
+			loops = []
+			loops.append(asyncio.create_task(ctx.main_loop()))
+			loops.append(asyncio.create_task(ctx.menu_loop()))
+			loops.append(asyncio.create_task(ctx.trap_loop()))
+			loops.append(asyncio.create_task(ctx.message_loop()))
+			loops.append(asyncio.create_task(ctx.guard_rail_loop()))
+			loops.append(asyncio.create_task(ctx.death_link_loop()))
+			loops.append(asyncio.create_task(ctx.ring_link_loop()))
 
 			# We update the locations checked if there was any location that was already checked before the connection
 			await ctx.update_locations_checked()
 			ctx.updateStageList()
 
-			# Activating Death Link and its loop
+			# Activating Death Link / Ring Link if needed
 			if ctx.options['death_link']:
 				await ctx.update_death_link(True)
-				asyncio.create_task(ctx.death_link_loop())
+				ctx.death_link_is_active = True
+
+			if ctx.options['death_link_amnesty']:
+				ctx.death_link_amnesty = ctx.options['death_link_amnesty']
+
+			if ctx.options['death_link_trigger']:
+				ctx.death_link_trigger = ctx.options['death_link_trigger']
 
 			if ctx.options['ring_link']:
-				ctx.addRingLinkTag()
-				asyncio.create_task(ctx.ring_link_loop())
+				ctx.setRingLinkTag(True)
+
+			# We set the limits for lives and bombs
+			ctx.handler.setLivesLimit(ctx.options['limit_lives'])
+			ctx.handler.setBombsLimit(ctx.options['limit_bombs'])
 
 			# Infinite loop while there is no error. If there is an error, we exit this loop in order to restart the connection
-			while not ctx.exit_event.is_set() and not ctx.inError:
+			while not ctx.exit_event.is_set() and ctx.server and not ctx.inError:
 				await asyncio.sleep(1)
+
+			# If we're here, we stop all the loops
+			for loop in loops:
+				try:
+					loop.cancel()
+				except:
+					pass
 
 def launch():
 	"""

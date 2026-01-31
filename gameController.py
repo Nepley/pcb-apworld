@@ -5,145 +5,9 @@ from .Variables import *
 
 class gameController:
 	"""Class accessing the game memory"""
-	pm = None
 
-	# Player
-	addrStage = None
-	addrDifficulty = None
-	addrCharacter = None
-	addrRank = None
-	addrShotType = None
-
-	# Resources
-	addrLives = None
-	addrBombs = None
-	addrPower = None
-	addrContinues = None
-
-	# Starting Resources
-	addrNormalStartingLives = None
-	addrNormalContinueLives = None
-	addrPracticeStartingLives = None
-	addrExtraPhantasmStartingLives = None
-	addrNormalStartingLives = None
-	addrStartingBombs = None
-	addrStartingPowerPoint = None
-
-	#Cherry
-	addrBaseCherry = None
-	addrCherry = None
-	addrCherryPlus = None
-	addrCherryPlusMax = None
-	addrCherryGiveLine = None
-	addrCherryPlusGiveLine = None
-
-	# Stats
-	addrMisses = None
-	addrScore = None
-
-	# Practice stage access
-	addrReimuAEasy = None
-	addrReimuANormal = None
-	addrReimuAHard = None
-	addrReimuALunatic = None
-
-	addrReimuBEasy = None
-	addrReimuBNormal = None
-	addrReimuBHard = None
-	addrReimuBLunatic = None
-
-	addrMarisaAEasy = None
-	addrMarisaANormal = None
-	addrMarisaAHard = None
-	addrMarisaALunatic = None
-
-	addrMarisaBEasy = None
-	addrMarisaBNormal = None
-	addrMarisaBHard = None
-	addrMarisaBLunatic = None
-
-	addrSakuyaAEasy = None
-	addrSakuyaANormal = None
-	addrSakuyaAHard = None
-	addrSakuyaALunatic = None
-
-	addrSakuyaBEasy = None
-	addrSakuyaBNormal = None
-	addrSakuyaBHard = None
-	addrSakuyaBLunatic = None
-
-	# Extra stage access
-	addrReimuAExtra = None
-	addrReimuBExtra = None
-	addrMarisaAExtra = None
-	addrMarisaBExtra = None
-	addrSakuyaAExtra = None
-	addrSakuyaBExtra = None
-
-	# Phantasm stage access
-	addrReimuAPhantasm = None
-	addrReimuBPhantasm = None
-	addrMarisaAPhantasm = None
-	addrMarisaBPhantasm = None
-	addrSakuyaAPhantasm = None
-	addrSakuyaBPhantasm = None
-
-	# Practice stage score
-	addrPracticeScore = None
-
-	# Character speed
-	addrNormalSpeed = None
-	addrFocusSpeed = None
-	addrNormalSpeedD = None
-	addrFocusSpeedD = None
-
-	# FPS
-	addrFpsText = None
-	addrFpsUpdate = None
-
-	# Other
-	addrControllerHandle = None
-	addrInput = None
-	addrGameMode = None
-	addrMenu = None
-	addrMenuCursor = None
-	addrIsBossPresent = None
-	addrKillCondition = None
-	addrCharacterLock = None
-	addrForceExtra = None
-	addrDemoCondtion = None
-	addrFocusCondition = None
-	addrAntiTemperHack = None
-
-	# Resources Hack
-	addrLifeHack1 = None
-	addrLifeHack2 = None
-	addrBombHack1 = None
-	addrBombHack2 = None
-	addrPowerHack1 = None
-	addrPowerHack2 = None
-	addrPowerHack3 = None
-
-	# Sound
-	addrCustomSoundId = None
-	addrSoundHack1 = None
-	addrSoundHack2 = None
-
-	# Difficulty
-	addrDifficultyDown = None
-	addrDifficultyUp = None
-	addrDifficutlyCondition = None
-	addrLastDifficulty = None
-	addrDefaultDifficulty1 = None
-	addrDefaultDifficulty2 = None
-	addrDefaultExtraDifficulty = None
-
-	# Time
-	addrTime1 = None
-	addrTime2 = None
-
-	def __init__(self, pid):
-		self.pm = pymem.Pymem(pid)
+	def __init__(self):
+		self.pm = pymem.Pymem(GAME_NAME)
 
 		self.addrStage = self.pm.base_address+ADDR_STAGE
 		self.addrDifficulty = self.pm.base_address+ADDR_DIFFICULTY
@@ -563,6 +427,9 @@ class gameController:
 	def getReimuAExtra(self):
 		return int.from_bytes(self.pm.read_bytes(self.addrReimuAExtra, 1))
 
+	def getReimuAPhantasm(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrReimuAPhantasm, 1))
+
 	def getReimuBEasy(self):
 		return int.from_bytes(self.pm.read_bytes(self.addrReimuBEasy, 1))
 
@@ -577,6 +444,9 @@ class gameController:
 
 	def getReimuBExtra(self):
 		return int.from_bytes(self.pm.read_bytes(self.addrReimuBExtra, 1))
+
+	def getReimuBPhantasm(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrReimuBPhantasm, 1))
 
 	def getMarisaAEasy(self):
 		return int.from_bytes(self.pm.read_bytes(self.addrMarisaAEasy, 1))
@@ -593,6 +463,9 @@ class gameController:
 	def getMarisaAExtra(self):
 		return int.from_bytes(self.pm.read_bytes(self.addrMarisaAExtra, 1))
 
+	def getMarisaAPhantasm(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrMarisaAPhantasm, 1))
+
 	def getMarisaBEasy(self):
 		return int.from_bytes(self.pm.read_bytes(self.addrMarisaBEasy, 1))
 
@@ -607,6 +480,45 @@ class gameController:
 
 	def getMarisaBExtra(self):
 		return int.from_bytes(self.pm.read_bytes(self.addrMarisaBExtra, 1))
+
+	def getMarisaBPhantasm(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrMarisaBPhantasm, 1))
+
+	def getSakuyaAEasy(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrSakuyaAEasy, 1))
+
+	def getSakuyaANormal(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrSakuyaANormal, 1))
+
+	def getSakuyaAHard(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrSakuyaAHard, 1))
+
+	def getSakuyaALunatic(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrSakuyaALunatic, 1))
+
+	def getSakuyaAExtra(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrSakuyaAExtra, 1))
+
+	def getSakuyaAPhantasm(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrSakuyaAPhantasm, 1))
+
+	def getSakuyaBEasy(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrSakuyaBEasy, 1))
+
+	def getSakuyaBNormal(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrSakuyaBNormal, 1))
+
+	def getSakuyaBHard(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrSakuyaBHard, 1))
+
+	def getSakuyaBLunatic(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrSakuyaBLunatic, 1))
+
+	def getSakuyaBExtra(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrSakuyaBExtra, 1))
+
+	def getSakuyaBPhantasm(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrSakuyaBPhantasm, 1))
 
 	def getInput(self):
 		return int.from_bytes(self.pm.read_bytes(self.addrInput, 1))
@@ -656,6 +568,92 @@ class gameController:
 
 	def getDifficultyUp(self):
 		return int.from_bytes(self.pm.read_bytes(self.addrDifficultyUp, 1))
+
+	def getCharacterDifficulty(self, character, shot, difficulty):
+		result = None
+		if character == REIMU:
+			if shot == SHOT_A:
+				if difficulty == EASY:
+					result = self.getReimuAEasy()
+				elif difficulty == NORMAL:
+					result = self.getReimuANormal()
+				elif difficulty == HARD:
+					result = self.getReimuAHard()
+				elif difficulty == LUNATIC:
+					result = self.getReimuALunatic()
+				elif difficulty == EXTRA:
+					result = self.getReimuAExtra()
+				elif difficulty == PHANTASM:
+					result = self.getReimuAPhantasm()
+			else:
+				if difficulty == EASY:
+					result = self.getReimuBEasy()
+				elif difficulty == NORMAL:
+					result = self.getReimuBNormal()
+				elif difficulty == HARD:
+					result = self.getReimuBHard()
+				elif difficulty == LUNATIC:
+					result = self.getReimuBLunatic()
+				elif difficulty == EXTRA:
+					result = self.getReimuBExtra()
+				elif difficulty == PHANTASM:
+					result = self.getReimuBPhantasm()
+		elif character == MARISA:
+			if shot == SHOT_A:
+				if difficulty == EASY:
+					result = self.getMarisaAEasy()
+				elif difficulty == NORMAL:
+					result = self.getMarisaANormal()
+				elif difficulty == HARD:
+					result = self.getMarisaAHard()
+				elif difficulty == LUNATIC:
+					result = self.getMarisaALunatic()
+				elif difficulty == EXTRA:
+					result = self.getMarisaAExtra()
+				elif difficulty == PHANTASM:
+					result = self.getMarisaAPhantasm()
+			else:
+				if difficulty == EASY:
+					result = self.getMarisaBEasy()
+				elif difficulty == NORMAL:
+					result = self.getMarisaBNormal()
+				elif difficulty == HARD:
+					result = self.getMarisaBHard()
+				elif difficulty == LUNATIC:
+					result = self.getMarisaBLunatic()
+				elif difficulty == EXTRA:
+					result = self.getMarisaBExtra()
+				elif difficulty == PHANTASM:
+					result = self.getMarisaBPhantasm()
+		elif character == SAKUYA:
+			if shot == SHOT_A:
+				if difficulty == EASY:
+					result = self.getSakuyaAEasy()
+				elif difficulty == NORMAL:
+					result = self.getSakuyaANormal()
+				elif difficulty == HARD:
+					result = self.getSakuyaAHard()
+				elif difficulty == LUNATIC:
+					result = self.getSakuyaALunatic()
+				elif difficulty == EXTRA:
+					result = self.getSakuyaAExtra()
+				elif difficulty == PHANTASM:
+					result = self.getSakuyaAPhantasm()
+			else:
+				if difficulty == EASY:
+					result = self.getSakuyaBEasy()
+				elif difficulty == NORMAL:
+					result = self.getSakuyaBNormal()
+				elif difficulty == HARD:
+					result = self.getSakuyaBHard()
+				elif difficulty == LUNATIC:
+					result = self.getSakuyaBLunatic()
+				elif difficulty == EXTRA:
+					result = self.getSakuyaBExtra()
+				elif difficulty == PHANTASM:
+					result = self.getSakuyaBPhantasm()
+
+		return result
 
 	def getFpsText(self):
 		return self.pm.read_bytes(self.addrFpsText, 8)

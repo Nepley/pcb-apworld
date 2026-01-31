@@ -44,13 +44,15 @@ In Normal mode, you need to finish the game normally with the resources only giv
 
 **Shot Type:** If checks are separated by shot type.
 
-**Difficulty:** If checks are separated by difficulty. In normal mode, it force the difficulty to be static. If Lunatic is excluded, no check will be behind it.
+**Difficulty:** If checks are separated by difficulty. If Lunatic is excluded, no check will be behind it.
 
 **Traps:** You can choose to have traps replacing a percentages of filler items. You can set the weight of each individual trap.
 
-**Death Link:** You can choose to activate Death Link.
+**Death Link:** You can choose to activate Death Link. You can also change if it's triggered by losing a life or getting a game over. And you can set an amnesty before it send a death to others. Can be changed at any time on the client.
 
-**Ring Link:** You can choose to activate Ring Link, synchronizing your gain and loss of Power Points.
+**Ring Link:** You can choose to activate Ring Link, synchronizing your gain and loss of Power Points. Can be changed at any time on the client.
+
+**Limit Lives/Bombs:** You can set a limit to your maximum number if lives/bombs in-game/ It doesn't remove any lives/bombs from the rando, but will do nothing once the maximum is reach. Can be changed at any time on the client.
 
 ## How to use
 

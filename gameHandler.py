@@ -23,8 +23,11 @@ class gameHandler:
 	extraBeaten = []
 	phantasmBeaten = []
 
-	def __init__(self, pid):
-		self.gameController = gameController(pid)
+	limitLives = 8
+	limitBombs = 8
+
+	def __init__(self):
+		self.gameController = gameController()
 		self.reset()
 		self.initGame()
 
@@ -273,10 +276,10 @@ class gameHandler:
 	#
 
 	def getLives(self):
-		return self.lives
+		return min(self.lives, self.limitLives)
 
 	def getBombs(self):
-		return self.bombs
+		return min(self.bombs, self.limitBombs)
 
 	def getPower(self):
 		return self.power
@@ -370,10 +373,10 @@ class gameHandler:
 		if(self.lives < 8):
 			self.lives += 1
 
-		self.gameController.setPracticeStartingLives(self.lives)
-		self.gameController.setNormalStartingLives(self.lives)
-		self.gameController.setNormalContinueLives(self.lives)
-		self.gameController.setExtraPhantasmStartingLives(self.lives)
+		self.gameController.setPracticeStartingLives(self.getLives())
+		self.gameController.setNormalStartingLives(self.getLives())
+		self.gameController.setNormalContinueLives(self.getLives())
+		self.gameController.setExtraPhantasmStartingLives(self.getLives())
 
 		if addInLevel and self.gameController.getGameMode() == IN_GAME:
 			self.gameController.setLives(self.gameController.getLives() + 1)
@@ -382,7 +385,7 @@ class gameHandler:
 		if(self.bombs < 8):
 			self.bombs += 1
 
-		self.gameController.setStartingBombs(self.bombs)
+		self.gameController.setStartingBombs(self.getBombs())
 
 		if addInLevel and self.gameController.getGameMode() == IN_GAME:
 			self.gameController.setBombs(self.gameController.getBombs() + 1)
@@ -419,6 +422,7 @@ class gameHandler:
 
 		# If it's the first, we unlock the Cherry Border
 		if self.cherry == 1:
+			self.can_get_cherry = True
 			self.gameController.setCanGetCherry(True)
 		else:
 			cherryMax = 50000 - ((self.cherry-1) * 5000)
@@ -479,6 +483,19 @@ class gameHandler:
 	def unlockCharacter(self, character, shot):
 		self.characters[character][shot] = True
 
+	def setLivesLimit(self, limit):
+		if limit >= 0 and limit <= 8:
+			self.limitLives = limit
+			self.gameController.setPracticeStartingLives(self.getLives())
+			self.gameController.setNormalStartingLives(self.getLives())
+			self.gameController.setNormalContinueLives(self.getLives())
+			self.gameController.setExtraPhantasmStartingLives(self.getLives())
+
+	def setBombsLimit(self, limit):
+		if limit >= 0 and limit <= 8:
+			self.limitBombs = limit
+			self.gameController.setStartingBombs(self.getBombs())
+
 	#
 	# Traps
 	#
@@ -535,8 +552,8 @@ class gameHandler:
 	# Other
 	#
 
-	def reconnect(self, pid):
-		self.gameController = gameController(pid)
+	def reconnect(self):
+		self.gameController = gameController()
 		self.initGame()
 
 	def initGame(self):
@@ -552,7 +569,7 @@ class gameHandler:
 		self.gameController.setNormalContinueLives(self.lives)
 		self.gameController.setStartingBombs(self.bombs)
 		self.gameController.setStartingPowerPoint(self.power)
-		self.gameController.setCanGetCherry(False)
+		self.gameController.setCanGetCherry(self.can_get_cherry)
 
 		self.gameController.initSoundHack()
 		self.gameController.initDifficultyHack()
@@ -569,6 +586,7 @@ class gameHandler:
 		self.power = 0
 		self.continues = 0
 		self.cherry = 0
+		self.can_get_cherry = False
 
 		self.stages = {}
 		for character in CHARACTERS:

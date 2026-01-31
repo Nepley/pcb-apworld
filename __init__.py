@@ -3,7 +3,7 @@ from .Variables import *
 
 from worlds.AutoWorld import World
 from worlds.LauncherComponents import Component, components, launch_subprocess, Type
-from .Items import TItem, get_items_by_category, item_table
+from .Items import TItem, get_items_by_category, item_table, item_groups
 from .Locations import location_table
 from .Options import Th07Options
 from .Regions import create_regions
@@ -26,11 +26,43 @@ class TWorld(World):
 	options: Th07Options
 	options_dataclass = Th07Options
 
+	item_name_groups = item_groups
 	item_name_to_id = {name: data.code for name, data in item_table.items()}
 	location_name_to_id = {name: id for name, id in location_table.items()}
 
 	def fill_slot_data(self) -> dict:
-		return {option_name: getattr(self.options, option_name).value for option_name in self.options_dataclass.__dataclass_fields__.keys()}
+		data = {
+			"mode": self.options.mode.value,
+			"stage_unlock": self.options.stage_unlock.value,
+			"exclude_lunatic": self.options.exclude_lunatic.value,
+			"cherry_border": self.options.cherry_border.value,
+			"number_life_mid": self.options.number_life_mid.value,
+			"number_bomb_mid": self.options.number_bomb_mid.value,
+			"difficulty_mid": self.options.difficulty_mid.value,
+			"number_life_end": self.options.number_life_end.value,
+			"number_bomb_end": self.options.number_bomb_end.value,
+			"difficulty_end": self.options.difficulty_end.value,
+			"shorter_stage_4": self.options.shorter_stage_4.value,
+			"extra_stage": self.options.extra_stage.value,
+			"number_life_extra": self.options.number_life_extra.value,
+			"number_bomb_extra": self.options.number_bomb_extra.value,
+			"phantasm_stage": self.options.phantasm_stage.value,
+			"number_life_phantasm": self.options.number_life_phantasm.value,
+			"number_bomb_phantasm": self.options.number_bomb_phantasm.value,
+			"shot_type": self.options.shot_type.value,
+			"difficulty_check": self.options.difficulty_check.value,
+			"check_multiple_difficulty": self.options.check_multiple_difficulty.value,
+			"goal": self.options.goal.value,
+			"ending_required": self.options.ending_required.value,
+			"death_link": self.options.death_link.value,
+			"death_link_trigger": self.options.death_link_trigger.value,
+			"death_link_amnesty": self.options.death_link_amnesty.value,
+			"ring_link": self.options.ring_link.value,
+			"limit_lives": self.options.limit_lives.value,
+			"limit_bombs": self.options.limit_bombs.value,
+		}
+
+		return data
 
 	def create_items(self):
 		item_pool: List[TItem] = []
