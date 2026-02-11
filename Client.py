@@ -676,7 +676,7 @@ class TouhouContext(CommonContext):
 		"""
 		Send a death link to the server if it's active.
 		"""
-		if self.options['death_link']:
+		if self.death_link_is_active:
 			await self.send_death()
 
 	def giveResources(self):
@@ -847,6 +847,7 @@ class TouhouContext(CommonContext):
 				elif(gameMode == IN_MENU):
 					# We enter in the menu
 					if(currentMode != IN_MENU):
+						await asyncio.sleep(0.5) # We wait a bit to be sure the menu is fully loaded
 						self.handler.resetStageVariables()
 						currentMode = IN_MENU
 						resourcesGiven = False
@@ -887,11 +888,16 @@ class TouhouContext(CommonContext):
 			while not self.exit_event.is_set() and self.handler and not self.inError:
 				await asyncio.sleep(0.1)
 				game_mode = self.handler.getGameMode()
+				inMenu = False
 				# If we failed to get the game mode, we skip the loop
 				if game_mode == -2:
 					continue
 
 				if game_mode == IN_MENU:
+					if not inMenu:
+						await asyncio.sleep(0.5)
+						inMenu = True
+
 					try:
 						menu = self.handler.getMenu()
 					except Exception as e:
@@ -920,6 +926,8 @@ class TouhouContext(CommonContext):
 						self.handler.updateCursor(self.minimalCursor)
 					except Exception as e:
 						pass
+				else:
+					inMenu = False
 		except Exception as e:
 			logger.error(f"Menu ERROR: {e}")
 			logger.error(traceback.format_exc())
@@ -1121,6 +1129,7 @@ class TouhouContext(CommonContext):
 									nb_death = 0
 								else:
 									logger.info(f"DeathLink: {nb_death}/{self.death_link_amnesty}")
+							hasDied = False
 
 						currentLives = self.handler.getCurrentLives()
 					elif hasDied: # If the player has deathbomb
@@ -1223,7 +1232,7 @@ class TouhouContext(CommonContext):
 
 				if self.handler.getGameMode() != IN_GAME:
 					if not in_menu:
-						await asyncio.sleep(2)  # Give some time for the menu to fully load
+						await asyncio.sleep(3)  # Give some time for the menu to fully load
 						in_menu = True
 
 					result = guard_rail.check_cursor_state()
@@ -1328,6 +1337,9 @@ async def game_watcher(ctx: TouhouContext):
 
 			if ctx.options['ring_link']:
 				ctx.setRingLinkTag(True)
+
+			if ctx.options['shorter_stage_4']:
+				ctx.shorter_stage_4 = True
 
 			# We set the limits for lives and bombs
 			ctx.handler.setLivesLimit(ctx.options['limit_lives'])

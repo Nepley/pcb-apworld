@@ -63,21 +63,6 @@ class GuardRail:
 				result["error"] = True
 				result["message"] = f"Starting power points not set correctly. Game: {starting_power_points}, Expected: {self.game_handler.getPower()}"
 
-		if not result["error"]:
-			# We check if stages are unlocked correctly if we're in practice mode
-			if self.options["mode"] == PRACTICE_MODE and self.game_handler.getGameMode() != IN_GAME:
-				stages = self.game_handler.stages
-				for character in CHARACTERS:
-					for shot in SHOTS:
-						handler_stage = stages[character][shot]
-						for difficulty in range(4):
-							if self.game_handler.characters[character][shot] and difficulty >= self.game_handler.getLowestDifficulty():
-								in_game_stage = self.memory_controller.getCharacterDifficulty(character, shot, difficulty)
-
-								if in_game_stage != handler_stage:
-									result["error"] = True
-									result["message"] = f"Character {character} - {shot} has incorrect stages ({in_game_stage} != {handler_stage}) for difficulty {difficulty}."
-
 		return result
 
 	def check_cursor_state(self):
@@ -170,5 +155,20 @@ class GuardRail:
 					if lock_down != minimum_cursor or lock_up != minimum_cursor:
 						result["error"] = True
 						result["message"] = f"Main menu cursor is not locked correctly. Minimum cursor should be {minimum_cursor}. Current locks are: {lock_down}, {lock_up}."
+
+			if not result["error"]:
+				# We check if stages are unlocked correctly if we're in practice mode
+				if self.options["mode"] == PRACTICE_MODE:
+					stages = self.game_handler.stages
+					for character in CHARACTERS:
+						for shot in SHOTS:
+							handler_stage = stages[character][shot]
+							for difficulty in range(4):
+								if self.game_handler.characters[character][shot] and difficulty >= self.game_handler.getLowestDifficulty():
+									in_game_stage = self.memory_controller.getCharacterDifficulty(character, shot, difficulty)
+
+									if in_game_stage != handler_stage:
+										result["error"] = True
+										result["message"] = f"Character {character} - {shot} has incorrect stages ({in_game_stage} != {handler_stage}) for difficulty {difficulty}."
 
 		return result
