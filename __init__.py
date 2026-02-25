@@ -216,63 +216,52 @@ class TWorld(World):
 		for character in character_list:
 			item_pool += [self.create_item(character) for _ in range(0, 1)]
 
-		# Creating and placing Endings
-		ending_normal_reimu = self.create_item("[Reimu] Ending - Yuyuko")
-		ending_normal_marisa = self.create_item("[Marisa] Ending - Yuyuko")
-		ending_normal_sakuya = self.create_item("[Sakuya] Ending - Yuyuko")
-		ending_extra_reimu = self.create_item("[Reimu] Ending - Ran")
-		ending_extra_marisa = self.create_item("[Marisa] Ending - Ran")
-		ending_extra_sakuya = self.create_item("[Sakuya] Ending - Ran")
-		ending_phantasm_reimu = self.create_item("[Reimu] Ending - Yukari")
-		ending_phantasm_marisa = self.create_item("[Marisa] Ending - Yukari")
-		ending_phantasm_sakuya = self.create_item("[Sakuya] Ending - Yukari")
-
 		# If we have the extra stage and the extra boss is a potential goal
 		if extra and goal not in [ENDING_NORMAL, ENDING_PHANTASM]:
 			if shot_type:
-				self.multiworld.get_location("[Reimu A] Stage Extra Clear", self.player).place_locked_item(ending_extra_reimu)
-				self.multiworld.get_location("[Reimu B] Stage Extra Clear", self.player).place_locked_item(ending_extra_reimu)
-				self.multiworld.get_location("[Marisa A] Stage Extra Clear", self.player).place_locked_item(ending_extra_marisa)
-				self.multiworld.get_location("[Marisa B] Stage Extra Clear", self.player).place_locked_item(ending_extra_marisa)
-				self.multiworld.get_location("[Sakuya A] Stage Extra Clear", self.player).place_locked_item(ending_extra_sakuya)
-				self.multiworld.get_location("[Sakuya B] Stage Extra Clear", self.player).place_locked_item(ending_extra_sakuya)
+				self.multiworld.get_location("[Reimu A] Stage Extra Clear", self.player).place_locked_item(self.create_item("[Reimu] Ending - Ran"))
+				self.multiworld.get_location("[Reimu B] Stage Extra Clear", self.player).place_locked_item(self.create_item("[Reimu] Ending - Ran"))
+				self.multiworld.get_location("[Marisa A] Stage Extra Clear", self.player).place_locked_item(self.create_item("[Marisa] Ending - Ran"))
+				self.multiworld.get_location("[Marisa B] Stage Extra Clear", self.player).place_locked_item(self.create_item("[Marisa] Ending - Ran"))
+				self.multiworld.get_location("[Sakuya A] Stage Extra Clear", self.player).place_locked_item(self.create_item("[Sakuya] Ending - Ran"))
+				self.multiworld.get_location("[Sakuya B] Stage Extra Clear", self.player).place_locked_item(self.create_item("[Sakuya] Ending - Ran"))
 				number_placed_item += 6
 			else:
-				self.multiworld.get_location("[Reimu] Stage Extra Clear", self.player).place_locked_item(ending_extra_reimu)
-				self.multiworld.get_location("[Marisa] Stage Extra Clear", self.player).place_locked_item(ending_extra_marisa)
-				self.multiworld.get_location("[Sakuya] Stage Extra Clear", self.player).place_locked_item(ending_extra_sakuya)
+				self.multiworld.get_location("[Reimu] Stage Extra Clear", self.player).place_locked_item(self.create_item("[Reimu] Ending - Ran"))
+				self.multiworld.get_location("[Marisa] Stage Extra Clear", self.player).place_locked_item(self.create_item("[Marisa] Ending - Ran"))
+				self.multiworld.get_location("[Sakuya] Stage Extra Clear", self.player).place_locked_item(self.create_item("[Sakuya] Ending - Ran"))
 				number_placed_item += 3
 
 		# If we have the phantasm stage and the extra boss is a potential goal
 		if phantasm and goal not in [ENDING_NORMAL, ENDING_EXTRA]:
 			if shot_type:
-				self.multiworld.get_location("[Reimu A] Stage Phantasm Clear", self.player).place_locked_item(ending_phantasm_reimu)
-				self.multiworld.get_location("[Reimu B] Stage Phantasm Clear", self.player).place_locked_item(ending_phantasm_reimu)
-				self.multiworld.get_location("[Marisa A] Stage Phantasm Clear", self.player).place_locked_item(ending_phantasm_marisa)
-				self.multiworld.get_location("[Marisa B] Stage Phantasm Clear", self.player).place_locked_item(ending_phantasm_marisa)
-				self.multiworld.get_location("[Sakuya A] Stage Phantasm Clear", self.player).place_locked_item(ending_phantasm_sakuya)
-				self.multiworld.get_location("[Sakuya B] Stage Phantasm Clear", self.player).place_locked_item(ending_phantasm_sakuya)
+				self.multiworld.get_location("[Reimu A] Stage Phantasm Clear", self.player).place_locked_item(self.create_item("[Reimu] Ending - Yukari"))
+				self.multiworld.get_location("[Reimu B] Stage Phantasm Clear", self.player).place_locked_item(self.create_item("[Reimu] Ending - Yukari"))
+				self.multiworld.get_location("[Marisa A] Stage Phantasm Clear", self.player).place_locked_item(self.create_item("[Marisa] Ending - Yukari"))
+				self.multiworld.get_location("[Marisa B] Stage Phantasm Clear", self.player).place_locked_item(self.create_item("[Marisa] Ending - Yukari"))
+				self.multiworld.get_location("[Sakuya A] Stage Phantasm Clear", self.player).place_locked_item(self.create_item("[Sakuya] Ending - Yukari"))
+				self.multiworld.get_location("[Sakuya B] Stage Phantasm Clear", self.player).place_locked_item(self.create_item("[Sakuya] Ending - Yukari"))
 				number_placed_item += 6
 			else:
-				self.multiworld.get_location("[Reimu] Stage Phantasm Clear", self.player).place_locked_item(ending_phantasm_reimu)
-				self.multiworld.get_location("[Marisa] Stage Phantasm Clear", self.player).place_locked_item(ending_phantasm_marisa)
-				self.multiworld.get_location("[Sakuya] Stage Phantasm Clear", self.player).place_locked_item(ending_phantasm_sakuya)
+				self.multiworld.get_location("[Reimu] Stage Phantasm Clear", self.player).place_locked_item(self.create_item("[Reimu] Ending - Yukari"))
+				self.multiworld.get_location("[Marisa] Stage Phantasm Clear", self.player).place_locked_item(self.create_item("[Marisa] Ending - Yukari"))
+				self.multiworld.get_location("[Sakuya] Stage Phantasm Clear", self.player).place_locked_item(self.create_item("[Sakuya] Ending - Yukari"))
 				number_placed_item += 3
 
 		# If the final boss is a potential goal
 		if (not extra and goal == ENDING_EXTRA) or (not phantasm and goal == ENDING_PHANTASM) or goal in [ENDING_NORMAL, ENDING_ALL]:
 			if shot_type:
-				self.multiworld.get_location("[Reimu A] Stage 6 Clear", self.player).place_locked_item(ending_normal_reimu)
-				self.multiworld.get_location("[Reimu B] Stage 6 Clear", self.player).place_locked_item(ending_normal_reimu)
-				self.multiworld.get_location("[Marisa A] Stage 6 Clear", self.player).place_locked_item(ending_normal_marisa)
-				self.multiworld.get_location("[Marisa B] Stage 6 Clear", self.player).place_locked_item(ending_normal_marisa)
-				self.multiworld.get_location("[Sakuya A] Stage 6 Clear", self.player).place_locked_item(ending_normal_sakuya)
-				self.multiworld.get_location("[Sakuya B] Stage 6 Clear", self.player).place_locked_item(ending_normal_sakuya)
+				self.multiworld.get_location("[Reimu A] Stage 6 Clear", self.player).place_locked_item(self.create_item("[Reimu] Ending - Yuyuko"))
+				self.multiworld.get_location("[Reimu B] Stage 6 Clear", self.player).place_locked_item(self.create_item("[Reimu] Ending - Yuyuko"))
+				self.multiworld.get_location("[Marisa A] Stage 6 Clear", self.player).place_locked_item(self.create_item("[Marisa] Ending - Yuyuko"))
+				self.multiworld.get_location("[Marisa B] Stage 6 Clear", self.player).place_locked_item(self.create_item("[Marisa] Ending - Yuyuko"))
+				self.multiworld.get_location("[Sakuya A] Stage 6 Clear", self.player).place_locked_item(self.create_item("[Sakuya] Ending - Yuyuko"))
+				self.multiworld.get_location("[Sakuya B] Stage 6 Clear", self.player).place_locked_item(self.create_item("[Sakuya] Ending - Yuyuko"))
 				number_placed_item += 6
 			else:
-				self.multiworld.get_location("[Reimu] Stage 6 Clear", self.player).place_locked_item(ending_normal_reimu)
-				self.multiworld.get_location("[Marisa] Stage 6 Clear", self.player).place_locked_item(ending_normal_marisa)
-				self.multiworld.get_location("[Sakuya] Stage 6 Clear", self.player).place_locked_item(ending_normal_sakuya)
+				self.multiworld.get_location("[Reimu] Stage 6 Clear", self.player).place_locked_item(self.create_item("[Reimu] Ending - Yuyuko"))
+				self.multiworld.get_location("[Marisa] Stage 6 Clear", self.player).place_locked_item(self.create_item("[Marisa] Ending - Yuyuko"))
+				self.multiworld.get_location("[Sakuya] Stage 6 Clear", self.player).place_locked_item(self.create_item("[Sakuya] Ending - Yuyuko"))
 				number_placed_item += 3
 
 		if traps > 0:
