@@ -823,12 +823,13 @@ class TouhouContext(CommonContext):
 						if bossPresent:
 							# If the boss is defeated, we update the locations
 							if(not self.handler.isBossPresent()):
-								if(not self.handler.isCurrentBossDefeated(bossCounter)):
-									#If the stage is ending, we disable traps and reset the counter
-									if bossCounter == nbBoss-1:
-										self.can_trap = False
-										bossCounter = -1
-									self.handler.setCurrentStageBossBeaten(bossCounter, self.check_multiple_difficulty)
+								#If the stage is ending, we disable traps and reset the counter
+								oldBossCounter = bossCounter
+								if bossCounter == nbBoss-1:
+									self.can_trap = False
+									bossCounter = -1
+								if(not self.handler.isCurrentBossDefeated(oldBossCounter)):
+									self.handler.setCurrentStageBossBeaten(oldBossCounter, self.check_multiple_difficulty)
 									await self.update_locations_checked()
 								bossPresent = False
 
