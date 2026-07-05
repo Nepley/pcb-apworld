@@ -667,7 +667,9 @@ class gameHandler:
 		"""
 		Method to be called when leaving a stage and reset the stage variables.
 		"""
-		self.gameController.resetBossPresent()
+
+		if self.isBossPresent():
+			self.gameController.resetBossPresent()
 
 	def updateCursor(self, minValue = -1):
 		"""

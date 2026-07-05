@@ -953,7 +953,10 @@ class gameController:
 		self.pm.write_float(self.addrFocusSpeedD, newFocusSpeedD)
 
 	def resetBossPresent(self):
-		self.pm.write_bytes(self.addrIsBossPresent, bytes([0]), 1)
+		try:
+			self.pm.write_bytes(self.addrIsBossPresent, bytes([0]), 1)
+		except pymem.exception.MemoryWriteError as e:
+			pass
 
 	def setPracticeStageScore(self, characterId, shotId, difficultyId, stageId, newScore):
 		return self.pm.write_int(self.addrPracticeScore[characterId][shotId][difficultyId][stageId], newScore)
