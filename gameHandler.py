@@ -738,3 +738,6 @@ class gameHandler:
 		"""
 		if self.gameController.getStage() == 4:
 			self.gameController.setTime(7000)
+
+	def setForcePowerReset(self, active):
+		self.gameController.setForcePowerReset(active)

@@ -797,6 +797,10 @@ class TouhouContext(CommonContext):
 						if(not self.handler.checkIfCurrentIsPossible((self.options['mode'] in NORMAL_MODE))):
 							noCheck = False
 
+						# If we are in normal mode, we remove the reset of the Power Point so it doesn't happen between stages
+						if self.options['mode'] in NORMAL_MODE:
+							self.handler.setForcePowerReset(False)
+
 					if(not resourcesGiven):
 						await asyncio.sleep(0.5)
 						self.giveResources()
@@ -853,6 +857,11 @@ class TouhouContext(CommonContext):
 						currentMode = IN_MENU
 						resourcesGiven = False
 						noCheck = False # We enable the checks once we're in the menu
+
+						# We put back the Power Point reset if we are in normal mode
+						if self.options['mode'] in NORMAL_MODE:
+							self.handler.setForcePowerReset(True)
+
 					self.updateStageList()
 		except Exception as e:
 			logger.error(f"Main ERROR: {e}")

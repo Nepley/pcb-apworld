@@ -1010,6 +1010,12 @@ class gameController:
 		self.pm.write_bytes(self.addrPowerHack2, bytes([0x90, 0x90]), 2)
 		self.pm.write_bytes(self.addrPowerHack3, bytes([0xD9, 0x05, 0x8B, 0xF6, 0x62, 0x00]), 6)
 
+	def setForcePowerReset(self, active):
+		if active:
+			self.pm.write_bytes(self.addrPowerHack1, bytes([0x90, 0x90]), 2)
+		else:
+			self.pm.write_bytes(self.addrPowerHack1, bytes([0xEB, 0x2D]), 2)
+
 	def initDifficultyHack(self):
 		self.pm.write_bytes(self.addrDifficutlyCondition, bytes([0xC6, 0x00]), 2)
 		self.pm.write_bytes(self.addrDefaultDifficulty1, bytes([0x03]), 1)
